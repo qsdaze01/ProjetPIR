@@ -29,7 +29,12 @@ void app_main(void){
 
     /*---------------------selection du fichier audio-------------------------------*/
     printf ("entrer le nom du fichier audio a extraire en data :\n");
+    
+    while ( (fichieraudio[0] = getchar() != '\n' ) && fichieraudio[0] != EOF ){
+        //Vide le Buffer
+    }
     scanf("%s", fichieraudio);
+
     printf ("nom du fichier : %s\n", fichieraudio);
     //sprintf (fichierdat,"%s.dat", fichieraudio);
     /*--------------fin de selection du fichier audio-------------------------------*/
@@ -123,7 +128,6 @@ void app_main(void){
     fclose(dat);
     /*---------------------fin de liberation de la memoire---------------------------*/
 
-	return 0;
 }
 
 
