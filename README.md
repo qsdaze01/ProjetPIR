@@ -20,5 +20,5 @@ Obtenir un graphique des fréquences en fonction du temps
 - Développer pour l'environnement LyraT
 
 
-**Notes pour Gaspard**
+**Notes pour Gaspard**  
 Pour utiliser la librairie <math.h> en C, il faut dans le Makefile rajouter -lm à la fin des lignes de gcc
