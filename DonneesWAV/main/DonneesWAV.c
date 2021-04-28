@@ -20,18 +20,18 @@ struct wavfile //définit la structure de l entete d un wave
     int         bytes_in_data;      // nombre de bytes de la partie data
 };
 
-void app_main(void){
+int main(){
 	
 	int i=0;
     int nbech=0; //nombre d echantillons extraits du fichier audio
     char fichieraudio[100];
-    char fichierdat[100];
+    //char fichierdat[100];
 
     /*---------------------selection du fichier audio-------------------------------*/
     printf ("entrer le nom du fichier audio a extraire en data :\n");
     scanf("%s", fichieraudio);
     printf ("nom du fichier : %s\n", fichieraudio);
-    sprintf (fichierdat,"%s.dat", fichieraudio);
+    //sprintf (fichierdat,"%s.dat", fichieraudio);
     /*--------------fin de selection du fichier audio-------------------------------*/
 
     /*---------------------ouverture du wave----------------------------------------*/
@@ -90,7 +90,8 @@ void app_main(void){
     /*---------------------remplissage du tableau tab avec les echantillons----------*/
     i=0;
     short value=0;
-    FILE *dat=fopen("son.dat","w"); //fichier data des echantillons
+    FILE *data_Et_Temps=fopen("son_Et_Temps.dat","w"); //fichier data des echantillons
+    FILE *dat=fopen("son.dat", "w");
 //    FILE *dat2=fopen("fabs_son.dat","w");//fichier.dat des valeurs absolues des echantillons
     //FILE *dat3=fopen(fichierdat,"w");
     while( fread(&value,(header.bits_per_sample)/8,1,wav) )
@@ -102,9 +103,11 @@ void app_main(void){
     printf("\nnombre d'echantillons lus : %d\n",i);
     for (i=0; i<nbech; i++)
     {
-        fprintf(dat,"%lf %lf\n", data[i], (1.*i/header.frequency));
-//permet de sauvegarder le tableau dans le fichier data.dat pour vérification manuelle des données
-//        fprintf(dat2,"%lf %lf\n", fabs(data[i]), (1.*i/header.frequency));
+        fprintf(data_Et_Temps,"%lf %lf\n", data[i], (1.*i/header.frequency));
+        fprintf(dat,"%lf \n", data[i]);
+
+        //permet de sauvegarder le tableau dans le fichier data.dat pour vérification manuelle des données
+        //fprintf(dat2,"%lf %lf\n", fabs(data[i]), (1.*i/header.frequency));
         //fprintf(dat3,"%lf %lf\n", 20*log10(fabs(data[i])), (1.*i/header.frequency));
 
     }
@@ -116,9 +119,11 @@ void app_main(void){
     free(data);
     data = NULL;
     fclose(wav);
+    fclose(data_Et_Temps);
     fclose(dat);
     /*---------------------fin de liberation de la memoire---------------------------*/
 
+	return 0;
 }
 
 
