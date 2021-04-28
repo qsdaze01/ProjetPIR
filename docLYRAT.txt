@@ -1,0 +1,18 @@
+Lien installation :
+https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/#step-4-set-up-the-environment-variables
+
+Conseils :
+-suivre l'installation normalement jusqu'à step 6
+-suivre le deuxième tuto sur le lien : https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/establish-serial-connection.html#example-output
+-bien faire l'élévation de privilège : sudo usermod -a -G dialout $USER (ATTENTION : elle n'est effective qu'après un redémarrage du PC)
+-suivre step 7 normalement
+-dans le menuconfig il faut bien vérifier le nombre de bauds que l'on veut utiliser (utile pour la suite)
+-pour la step 8, avant de faire le flash il faut garder appuyé le bouton boot puis appuyer sur reset puis relacher reset puis relacher boot (voilà donc juste trouver ce truc ça m'a pris 1h30 mdrr)
+-suivre step 10 normalement
+-pour lancer le programme il est parfois nécessaire d'appuyer sur reset
+-pour l'arrêter il faut faire ctrl + alt GR + ) 
+
+A chaque redémarrage :
+-alias get_idf='. $HOME/esp/esp-idf/export.sh'
+-get_idf
+-le port à mettre est /dev/ttyUSB0

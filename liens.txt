@@ -1,0 +1,8 @@
+Lien conf pour la polyphonie
+https://www.youtube.com/watch?v=at2NppqIZok&ab_channel=EpicPythonVideos
+
+Site pour aubio
+https://aubio.org/manual/latest/
+
+Installation interface carte
+https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/
