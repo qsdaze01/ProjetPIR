@@ -20,7 +20,7 @@ struct wavfile //définit la structure de l entete d un wave
     int         bytes_in_data;      // nombre de bytes de la partie data
 };
 
-int main(){
+void app_main(void){
 	
 	int i=0;
     int nbech=0; //nombre d echantillons extraits du fichier audio
