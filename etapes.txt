@@ -1,0 +1,24 @@
+Première étape :
+-installation aubio 
+-premiers tests d'aubio
+-installation esp-idf
+-premiers tests esp-idf
+-installation esp-adf ?
+
+Deuxième étape :
+-enregistrement d'un fichier audio via le micro sur la carte Lyrat
+-traitement de la hauteur de notes du fichier sur la carte via aubio 
+-enregistrement des résultats sur un fichier texte ou sur un autre type de fichier (mais pas de mise en forme)
+
+Troisième étape :
+-traitement des attaques, du tempo
+-premiers essais sur de la polyphonie
+
+Quatrième étape :
+-mise en forme (partition ?)
+-polyphonie
+
+
+Questions :
+-est-ce qu'on peut utiliser adf ?
+-comment implémenter aubio sur la plaque ?

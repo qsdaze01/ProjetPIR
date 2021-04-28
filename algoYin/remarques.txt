@@ -1,0 +1,8 @@
+Remarques : 
+-il faut recompiler le fichier Test_Yin.c à chaque fois que l'on veut changer les valeurs d'entrée
+-on ne peut pas réduire la confidence en dessous de 0.08 (erreur de segmentation sinon), je ne sais pas pourquoi
+-méthode qui ne fait que du monophonique
+
+Lecture fichier .wav :
+http://physique.unice.fr/sem6/2012-2013/PagesWeb/PT/Reverberation/page2.html
+
