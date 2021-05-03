@@ -3,7 +3,6 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := LectureSD
+PROJECT_NAME := sd_card
 
 include $(IDF_PATH)/make/project.mk
-
