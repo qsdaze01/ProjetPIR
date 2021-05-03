@@ -101,7 +101,7 @@ void app_main(void)
     sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
 
     // To use 1-line SD mode, uncomment the following line:
-    // slot_config.width = 1;
+    slot_config.width = 1;
 
     // GPIOs 15, 2, 4, 12, 13 should have external 10k pull-ups.
     // Internal pull-ups are not sufficient. However, enabling internal pull-ups
