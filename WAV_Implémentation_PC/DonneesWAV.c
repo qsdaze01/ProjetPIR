@@ -126,18 +126,3 @@ int main(){
 	return 0;
 }
 
-
-
-
-
-
-/* FILE * fichierWav;
-
-	fichierWav = fopen("11_11.wav","r");
-
-	char buffer[10000];
-
-	fgets(buffer, 10000, fichierWav);
-	printf("Données : %s \n", buffer);
-
-	fclose(fichierWav);*/
