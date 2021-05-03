@@ -6,7 +6,7 @@
 # It is included in the main 'build.ninja'.
 
 # =============================================================================
-# Project: sd_card
+# Project: WAV_SD
 # Configuration: 
 # =============================================================================
 # =============================================================================
@@ -22,7 +22,7 @@ rule CUSTOM_COMMAND
 #############################################
 # Rule for compiling C files.
 
-rule C_COMPILER__sd_card.2eelf
+rule C_COMPILER__WAV_SD.2eelf
   depfile = $DEP_FILE
   deps = gcc
   command = /home/gaspard/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out   -c $in
@@ -32,7 +32,7 @@ rule C_COMPILER__sd_card.2eelf
 #############################################
 # Rule for linking CXX executable.
 
-rule CXX_EXECUTABLE_LINKER__sd_card.2eelf
+rule CXX_EXECUTABLE_LINKER__WAV_SD.2eelf
   command = $PRE_LINK && /home/gaspard/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-g++  $FLAGS  $LINK_FLAGS $in  -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
@@ -1498,7 +1498,7 @@ rule C_STATIC_LIBRARY_LINKER____idf_main
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /usr/bin/cmake -S/home/gaspard/esp/sd_card -B/home/gaspard/esp/sd_card/build
+  command = /usr/bin/cmake -S/home/gaspard/esp/WAV_SD -B/home/gaspard/esp/WAV_SD/build
   description = Re-running CMake...
   generator = 1
 

@@ -3,6 +3,6 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := sd_card
+PROJECT_NAME := WAV_SD
 
 include $(IDF_PATH)/make/project.mk

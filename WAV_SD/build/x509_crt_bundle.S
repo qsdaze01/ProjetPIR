@@ -1,4 +1,4 @@
-/* * Data converted from /home/gaspard/esp/sd_card/build/esp-idf/mbedtls/x509_crt_bundle
+/* * Data converted from /home/gaspard/esp/WAV_SD/build/esp-idf/mbedtls/x509_crt_bundle
  */
 .data
 .section .rodata.embedded

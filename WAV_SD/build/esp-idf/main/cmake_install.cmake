@@ -1,4 +1,4 @@
-# Install script for directory: /home/gaspard/esp/sd_card/main
+# Install script for directory: /home/gaspard/esp/WAV_SD/main
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

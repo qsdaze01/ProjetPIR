@@ -1,2 +1,2 @@
-idf_component_register(SRCS "sd_card_example_main.c"
+idf_component_register(SRCS "WAV_SD.c"
                     INCLUDE_DIRS ".")

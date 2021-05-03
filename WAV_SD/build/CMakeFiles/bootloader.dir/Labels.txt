@@ -1,13 +1,13 @@
 # Target labels
  bootloader
 # Source files and their labels
-/home/gaspard/esp/sd_card/build/CMakeFiles/bootloader
-/home/gaspard/esp/sd_card/build/CMakeFiles/bootloader.rule
-/home/gaspard/esp/sd_card/build/CMakeFiles/bootloader-complete.rule
-/home/gaspard/esp/sd_card/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
-/home/gaspard/esp/sd_card/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
-/home/gaspard/esp/sd_card/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
-/home/gaspard/esp/sd_card/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule
-/home/gaspard/esp/sd_card/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
-/home/gaspard/esp/sd_card/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
-/home/gaspard/esp/sd_card/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+/home/gaspard/esp/WAV_SD/build/CMakeFiles/bootloader
+/home/gaspard/esp/WAV_SD/build/CMakeFiles/bootloader.rule
+/home/gaspard/esp/WAV_SD/build/CMakeFiles/bootloader-complete.rule
+/home/gaspard/esp/WAV_SD/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+/home/gaspard/esp/WAV_SD/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+/home/gaspard/esp/WAV_SD/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+/home/gaspard/esp/WAV_SD/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule
+/home/gaspard/esp/WAV_SD/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+/home/gaspard/esp/WAV_SD/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+/home/gaspard/esp/WAV_SD/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule

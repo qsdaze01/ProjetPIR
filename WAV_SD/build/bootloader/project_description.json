@@ -1,8 +1,8 @@
 {
     "project_name":       "bootloader",
     "project_path":       "/home/gaspard/esp/esp-idf/components/bootloader/subproject",
-    "build_dir":          "/home/gaspard/esp/sd_card/build/bootloader",
-    "config_file":        "/home/gaspard/esp/sd_card/sdkconfig",
+    "build_dir":          "/home/gaspard/esp/WAV_SD/build/bootloader",
+    "config_file":        "/home/gaspard/esp/WAV_SD/sdkconfig",
     "config_defaults":    "",
     "app_elf":            "bootloader.elf",
     "app_bin":            "bootloader.bin",

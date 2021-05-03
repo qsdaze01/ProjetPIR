@@ -24,7 +24,7 @@ void app_main(void){
 	
 	int i=0;
     int nbech=0; //nombre d echantillons extraits du fichier audio
-    char fichieraudio[100];
+    char fichieraudio[100] = "OpenA.wav";
     //char fichierdat[100];
 
     /*---------------------selection du fichier audio-------------------------------*/
@@ -82,7 +82,6 @@ void app_main(void){
     {
         exit(0);
     }
-
     /*---------------------fin de creation des tableaux dynamiques-------------------*/
     
 	/*---------------------initialisation des tableaux dynamiques--------------------*/
