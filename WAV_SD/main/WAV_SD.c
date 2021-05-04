@@ -88,6 +88,7 @@ struct wavfile //définit la structure de l'entête d un wave
 };
 
 
+
 void app_main(void)
 {
     esp_err_t ret;
@@ -188,16 +189,14 @@ void app_main(void)
         TRAITEMENT DU WAV 
         *****************
     */
-    printf("1\n");
     int i=0;
     int nbech=0; //nombre d echantillons extraits du fichier audio
-    char fichieraudio[100] = "OpenA.wav";
     
     /*---------------------ouverture du wave----------------------------------------*/
     FILE *wav = fopen(MOUNT_POINT"/OpenA.wav","rb"); //ouverture du fichier wave
     struct wavfile header; //creation du header
     /*---------------------fin de ouverture du wave---------------------------------*/
-    printf("2\n");
+
     /*---------------------lecture de l entete et enregistrement dans header--------*/
     //initialise le header par l'entete du fichier wave
     //verifie que le fichier posséde un entete compatible
@@ -223,58 +222,32 @@ void app_main(void)
     printf("bytes by capture %hi \n", header.bytes_by_capture);
     nbech=(header.bytes_in_data/header.bytes_by_capture);
     /*------------------fin de determiner la taille des tableaux---------------------*/
-    printf("3\n");
-    /*---------------------creation des tableaux dynamiques--------------------------*/
-    float *data=NULL; //tableau de l'onde temporelle
-    data=malloc( (nbech) * sizeof(float));
-    if (data == NULL)
-    {
-        exit(0);
-    }
-    /*---------------------fin de creation des tableaux dynamiques-------------------*/
-    printf("4\n");
-    /*---------------------initialisation des tableaux dynamiques--------------------*/
-    for(i=0; i<nbech; i++)
-    {
-        data[i]=0;
-    }
-    /*---------------------fin de initialisation des tableaux dynamiques-------------*/
+
+    short value= 0;
+    float res = 0;
+    //FILE *data_Et_Temps=fopen("son_Et_Temps.dat","a"); //fichier data des echantillons
+    FILE *dat=fopen(MOUNT_POINT"/son.dat", "w");
 
     /*---------------------remplissage du tableau tab avec les echantillons----------*/
-    i=0;
-    short value=0;
-    FILE *data_Et_Temps=fopen("son_Et_Temps.dat","w"); //fichier data des echantillons
-    FILE *dat=fopen("son.dat", "w");
     //FILE *dat2=fopen("fabs_son.dat","w");//fichier.dat des valeurs absolues des echantillons
     //FILE *dat3=fopen(fichierdat,"w");
-    printf("5\n");
-    while( fread(&value,(header.bits_per_sample)/8,1,wav) )
-    {
-        //lecture des echantillons et enregistrement dans le tableau
-        data[i]=value;
-        i++;
-    }
-    printf("\nnombre d'echantillons lus : %d\n",i);
-    for (i=0; i<nbech; i++)
-    {
-        fprintf(data_Et_Temps,"%lf %lf\n", data[i], (1.*i/header.frequency));
-        fprintf(dat,"%lf \n", data[i]);
 
-        //permet de sauvegarder le tableau dans le fichier data.dat pour vérification manuelle des données
+    while(fread(&value,(header.bits_per_sample)/8,1,wav)){
+
+    	res = value;
+
+        //fprintf(data_Et_Temps,"%lf %lf\n", value, (1.*i/header.frequency));
+        fprintf(dat,"%lf \n", res);
         //fprintf(dat2,"%lf %lf\n", fabs(data[i]), (1.*i/header.frequency));
         //fprintf(dat3,"%lf %lf\n", 20*log10(fabs(data[i])), (1.*i/header.frequency));
-
+    
     }
-    printf("6\n");
     /*-----------------fin de remplissage du tableau avec les echantillons-----------*/
 
      /*---------------------liberation de la memoire----------------------------------*/
     //liberation de la ram des malloc
-
-    free(data);
-    data = NULL;
     fclose(wav);
-    fclose(data_Et_Temps);
+    //fclose(data_Et_Temps);
     fclose(dat);
     printf("Fin \n");
     /*---------------------fin de liberation de la memoire---------------------------*/
