@@ -24,7 +24,5 @@ Obtenir un graphique des fréquences en fonction du temps
 Pour utiliser la librairie <math.h> en C, il faut dans le Makefile rajouter -lm à la fin des lignes de gcc
 
 **Problèmes**   
-Erreur sur le malloc ligne 229 dans le main du WAV_SD   
-Lorsque l'on remplace nbech par un petit nombre cela fonctionne mais pas si on le remplace par un grand nombre (nbech étant un grand nombre)   
-
+Programme très long même pour un petit fichier audio   
 
