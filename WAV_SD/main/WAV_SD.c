@@ -1,11 +1,3 @@
-/* SD card and FAT filesystem example.
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -28,7 +20,6 @@ static const char *TAG = "example";
 
 #define MOUNT_POINT "/sdcard"
 
-// This example can use SDMMC and SPI peripherals to communicate with SD card.
 // By default, SDMMC peripheral is used.
 // To enable SPI mode, uncomment the following line:
 
@@ -71,7 +62,7 @@ static const char *TAG = "example";
 #endif //CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
 #endif //USE_SPI_MODE
 
-struct wavfile //définit la structure de l'entête d un wave
+struct wavfile //définit la structure de l'entête d un wav
 {
     char        id[4];          // doit contenir "RIFF"
     int         totallength;        // taille totale du fichier moins 8 bytes
@@ -91,6 +82,13 @@ struct wavfile //définit la structure de l'entête d un wave
 
 void app_main(void)
 {
+    
+    /* 
+        *******************************************************************************************************************
+        Chargement des paramètres pour la lecture de la carte SD
+        *******************************************************************************************************************
+    */
+
     esp_err_t ret;
     // Options for mounting the filesystem.
     // If format_if_mount_failed is set to true, SD card will be partitioned and
@@ -174,32 +172,21 @@ void app_main(void)
     // Card has been initialized, print its properties
     sdmmc_card_print_info(stdout, card);
 
-    // Use POSIX and C standard library functions to work with files.
-    // First create a file.
-    /*
-    ESP_LOGI(TAG, "Opening file");
-    FILE* f = fopen(MOUNT_POINT"/hello.txt", "w");
-    if (f == NULL) {
-        ESP_LOGE(TAG, "Failed to open file for writing");
-        return;
-    }
-    */
     /* 
-        *****************
+        *******************************************************************************************************************
         TRAITEMENT DU WAV 
-        *****************
+        *******************************************************************************************************************
     */
-    int i=0;
-    int nbech=0; //nombre d echantillons extraits du fichier audio
+
     
-    /*---------------------ouverture du wave----------------------------------------*/
-    FILE *wav = fopen(MOUNT_POINT"/OpenA.wav","rb"); //ouverture du fichier wave
-    struct wavfile header; //creation du header
+    /*---------------------ouverture du wav*----------------------------------------*/
+    FILE *wav = fopen(MOUNT_POINT"/OpenA.wav","rb"); //ouverture du fichier wav
+    struct wavfile header; //création du header
     /*---------------------fin de ouverture du wave---------------------------------*/
 
-    /*---------------------lecture de l entete et enregistrement dans header--------*/
-    //initialise le header par l'entete du fichier wave
-    //verifie que le fichier posséde un entete compatible
+    /*---------------------lecture de l'entête et enregistrement dans header--------*/
+    //initialise le header par l'entête du fichier wav
+    //vérifie que le fichier possède un entête compatible
     if ( fread(&header,sizeof(header),1,wav) < 1 )
     {
         printf("\nne peut pas lire le header\n");
@@ -215,43 +202,35 @@ void app_main(void)
         printf("\nerreur : le fichier n'est pas mono\n");
         exit(1);
     }
-    /*----------------fin de lecture de l entete et enregistrement dans header-------*/
-
-    /*-------------------------determiner la taille des tableaux---------------------*/
-    printf("bytes in data %d \n", header.bytes_in_data);
-    printf("bytes by capture %hi \n", header.bytes_by_capture);
-    nbech=(header.bytes_in_data/header.bytes_by_capture);
-    /*------------------fin de determiner la taille des tableaux---------------------*/
+    /*----------------fin de lecture de l'entête et enregistrement dans header-------*/
 
     short value= 0;
     float res = 0;
-    //FILE *data_Et_Temps=fopen("son_Et_Temps.dat","a"); //fichier data des echantillons
     FILE *dat=fopen(MOUNT_POINT"/son.dat", "w");
 
-    /*---------------------remplissage du tableau tab avec les echantillons----------*/
-    //FILE *dat2=fopen("fabs_son.dat","w");//fichier.dat des valeurs absolues des echantillons
+    //FILE *data_Et_Temps=fopen("son_Et_Temps.dat","a"); //fichier data des échantillons
+    //FILE *dat2=fopen("fabs_son.dat","w");//fichier.dat des valeurs absolues des échantillons
     //FILE *dat3=fopen(fichierdat,"w");
 
     while(fread(&value,(header.bits_per_sample)/8,1,wav)){
 
     	res = value;
 
-        //fprintf(data_Et_Temps,"%lf %lf\n", value, (1.*i/header.frequency));
         fprintf(dat,"%lf \n", res);
+
+        //fprintf(data_Et_Temps,"%lf %lf\n", value, (1.*i/header.frequency));
         //fprintf(dat2,"%lf %lf\n", fabs(data[i]), (1.*i/header.frequency));
         //fprintf(dat3,"%lf %lf\n", 20*log10(fabs(data[i])), (1.*i/header.frequency));
     
     }
-    /*-----------------fin de remplissage du tableau avec les echantillons-----------*/
 
-     /*---------------------liberation de la memoire----------------------------------*/
+     /*---------------------libération de la mémoire----------------------------------*/
     //liberation de la ram des malloc
     fclose(wav);
     //fclose(data_Et_Temps);
     fclose(dat);
     printf("Fin \n");
-    /*---------------------fin de liberation de la memoire---------------------------*/
-
+    /*---------------------fin de libération de la mémoire---------------------------*/
 
     // All done, unmount partition and disable SDMMC or SPI peripheral
     esp_vfs_fat_sdcard_unmount(mount_point, card);
