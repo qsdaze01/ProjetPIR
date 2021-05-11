@@ -236,9 +236,10 @@ void app_main(void){
 
 		
 		/*					Moyennage					*/
-		moyennage(bufferSortie, bufferRes, 265, pointeurRes);
-		pointeurRes += 1;
-
+		if(pointeur == 264){
+            moyennage(bufferSortie, bufferRes, 265, pointeurRes);
+            pointeurRes += 1;
+        }
 		
 		/* 			Mise à jour du buffer 				*/
 		if(pointeur == 264){
