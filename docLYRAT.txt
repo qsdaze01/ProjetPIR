@@ -15,4 +15,5 @@ Conseils :
 A chaque redémarrage :
 -alias get_idf='. $HOME/esp/esp-idf/export.sh'
 -get_idf
+- idf.py set-target esp32
 -le port à mettre est /dev/ttyUSB0
