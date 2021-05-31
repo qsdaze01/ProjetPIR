@@ -12,8 +12,8 @@
 
 void AudioInit(AudioDspType Adt){
   // config i2s pin numbers
-  i2s_pin_config_t pin_config;
-  pin_config = {
+  //i2s_pin_config_t pin_config;
+  i2s_pin_config_t pin_config = {
     .bck_io_num = 5,
     .ws_io_num = 25,
     .data_out_num = 26,
@@ -26,7 +26,7 @@ void AudioInit(AudioDspType Adt){
     .sample_rate = Adt.fSampleRate,
     .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
     .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,
-    .communication_format = I2S_COMM_FORMAT_I2S,
+    .communication_format = I2S_COMM_FORMAT_STAND_I2S,
     .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1, // high interrupt priority
     .dma_buf_count = 3,
     .dma_buf_len = Adt.fBufferSize,
@@ -56,7 +56,7 @@ bool start(AudioDspType Adt)
 {
   if (!Adt.fRunning) {
     Adt.fRunning = true;
-    return (xTaskCreatePinnedToCore(audioTaskHandler(Adt), "Audio DSP Task", 4096, Adt, 24, &(Adt.fHandle), 0) == pdPASS);
+    return (xTaskCreatePinnedToCore(audioTaskHandler, "Audio DSP Task", 4096, &Adt, 24, &(Adt.fHandle), 0) == pdPASS);
   } 
   else {
     return true;
