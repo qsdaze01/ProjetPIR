@@ -2,11 +2,13 @@
 
 
 **Etapes du projet**
-- Faire toutes les installations nécessaires (voir guide d'install docLyrat.txt)
-- Enregistrer un fichier au format .wav grâce à la LyraT, dans un premier temps un son monophonique
-- Récupérer les valeurs des échantillons du wav grâce à la LyraT pour les mettre dans une structure de données appropriée (Liste?)
-- Appliquer un traitement sur ces échantillons de manière à obtenir les fréquences instantannées
-- Produire un graphique des fréquences instantanées en fonction du temps et l'exporter
+- Faire toutes les installations nécessaires (voir guide d'install docLyrat.txt) [Fait]    
+- Récupérer les valeurs des échantillons du micro grâce à la LyraT pour les mettre dans une structure de données appropriée (Liste?) [En cours]    
+	-Conversion des fichiers C++ en C [En cours]        
+		-ES8388 [Fait]     
+		-AudioDSP [En cours, à tester]      
+- Appliquer un traitement sur ces échantillons de manière à obtenir les fréquences instantannées [Codé mais pas testé]     
+- Produire un graphique des fréquences instantanées en fonction du temps et l'exporter    
 
 **Objectif final :**
 Obtenir un graphique des fréquences en fonction du temps
@@ -22,7 +24,4 @@ Obtenir un graphique des fréquences en fonction du temps
 
 **Notes pour Gaspard**  
 Pour utiliser la librairie <math.h> en C, il faut dans le Makefile rajouter -lm à la fin des lignes de gcc
-
-**Problèmes**   
-Programme très long même pour un petit fichier audio   
 
