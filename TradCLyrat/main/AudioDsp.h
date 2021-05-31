@@ -34,7 +34,7 @@ typedef struct {
 void AudioInit(AudioDspType Adt);
 bool start(AudioDspType Adt);
 void stop(AudioDspType Adt);
-void audioTask(AudioDspType Adt);
-void audioTaskHandler(AudioDspType Adt);
+void audioTask(void * Adt);
+void audioTaskHandler(void * Adt);
 
 #endif

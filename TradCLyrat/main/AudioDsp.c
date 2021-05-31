@@ -56,7 +56,7 @@ bool start(AudioDspType Adt)
 {
   if (!Adt.fRunning) {
     Adt.fRunning = true;
-    return (xTaskCreatePinnedToCore(audioTaskHandler, "Audio DSP Task", 4096, &Adt, 24, &(Adt.fHandle), 0) == pdPASS);
+    return (xTaskCreatePinnedToCore(&audioTaskHandler, "Audio DSP Task", 4096, &Adt, 24, &(Adt.fHandle), 0) == pdPASS);
   } 
   else {
     return true;
@@ -73,41 +73,42 @@ void stop(AudioDspType Adt)
   }
 }
 
-void audioTask(AudioDspType Adt)
+void audioTask(void * Adt)
 {
+	//Régler les problèmes de passage de variables
   // inifinite loop
-  while (Adt.fRunning) {
-    int16_t samples_data_in[Adt.fNumOutputs*Adt.fBufferSize];
-    int16_t samples_data_out[Adt.fNumOutputs*Adt.fBufferSize];
+  while (true) {
+    int16_t samples_data_in[2*16]; //Adt.fBufferSize = 16; Adt.fNumInputs = 2;Adt.fNumOutputs = 2;
+    int16_t samples_data_out[2*16];
     
     // retrieving input buffer
     size_t bytes_read = 0;
-    i2s_read((i2s_port_t)0, &samples_data_in, Adt.fNumInputs*sizeof(int16_t)*Adt.fBufferSize, &bytes_read, portMAX_DELAY);
+    i2s_read((i2s_port_t)0, &samples_data_in, 2*sizeof(int16_t)*16, &bytes_read, portMAX_DELAY);
     
     // processing buffers
-    for (int i = 0; i < Adt.fBufferSize; i++) {
+    for (int i = 0; i < 16; i++) {
       // input buffer to float
-      float inSampleL = samples_data_in[i*Adt.fNumInputs]*DIV_S16;
-      float inSampleR = samples_data_in[i*Adt.fNumInputs+1]*DIV_S16;
+      float inSampleL = samples_data_in[i*2]*DIV_S16;
+      float inSampleR = samples_data_in[i*2+1]*DIV_S16;
       
       // DSP
       //inSampleL = echoL.tick(inSampleL);
       //inSampleR = echoR.tick(inSampleR);
       
       // copying to output buffer
-      samples_data_out[i*Adt.fNumOutputs] = inSampleL*MULT_S16;
-      samples_data_out[i*Adt.fNumOutputs+1] = inSampleR*MULT_S16;
+      samples_data_out[i*2] = inSampleL*MULT_S16;
+      samples_data_out[i*2+1] = inSampleR*MULT_S16;
     }
     // transmitting output buffer
     size_t bytes_written = 0;
-    i2s_write((i2s_port_t)0, &samples_data_out, Adt.fNumOutputs*sizeof(int16_t)*Adt.fBufferSize, &bytes_written, portMAX_DELAY);
+    i2s_write((i2s_port_t)0, &samples_data_out, 2*sizeof(int16_t)*16, &bytes_written, portMAX_DELAY);
   }
   // Task has to deleted itself beforee returning
   vTaskDelete(NULL);
 }
 
 // static cast of the audio task
-void audioTaskHandler(AudioDspType Adt)
+void audioTaskHandler(void * Adt)
 {
   //AudioDsp* audio = static_cast<AudioDsp*>(arg);
   audioTask(Adt);
