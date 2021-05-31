@@ -13,14 +13,17 @@ void app_main(){
 
 	Adt.fSampleRate = 48000;
 	Adt.fBufferSize = 16;
-	Adt.NumInputs = 2;
+	Adt.fNumInputs = 2;
 	Adt.fNumOutputs = 2;
-	Adt.fHandle = nullptr;
+	Adt.fHandle = NULL;
 	Adt.fRunning = false;
 
 	//audioDsp(48000,16);
-  	audioDsp.start();
+  	AudioInit(Adt);
+  	start(Adt);
 
-	
+	// waiting forever
+  	vTaskSuspend(NULL);
+
 	return;
 }

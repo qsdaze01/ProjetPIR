@@ -4,9 +4,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "../../lib/Echo.h"
-
-class AudioDsp
+/*class AudioDsp
 {
 public:
   AudioDsp(int SR, int BS);
@@ -21,7 +19,7 @@ private:
   bool fRunning;
   
   Echo echoL, echoR;
-};
+};*/
 
 typedef struct {
 	
@@ -29,8 +27,14 @@ typedef struct {
 	TaskHandle_t fHandle;
 	bool fRunning;
   
-	Echo echoL, echoR;
+	//Echo echoL, echoR;
 
 } AudioDspType;
+
+void AudioInit(AudioDspType Adt);
+bool start(AudioDspType Adt);
+void stop(AudioDspType Adt);
+void audioTask(AudioDspType Adt);
+void audioTaskHandler(AudioDspType Adt);
 
 #endif
