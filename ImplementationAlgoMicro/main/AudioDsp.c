@@ -243,8 +243,8 @@ bool start(AudioDspType Adt)
     sdmmc_card_print_info(stdout, card);
 
   if (!Adt.fRunning) {
-    Adt.fRunning = true;
-    xTaskCreatePinnedToCore(&audioTaskHandler, "Audio DSP Task", 4096, &Adt, 24, &(Adt.fHandle), 0);
+    Adt.fRunning = true;  
+    xTaskCreatePinnedToCore(&audioTaskHandler, "Audio DSP Task", 30000, &Adt, 24, &(Adt.fHandle), 0);
     // All done, unmount partition and disable SDMMC or SPI peripheral
     esp_vfs_fat_sdcard_unmount(mount_point, card);
     ESP_LOGI(TAG, "Card unmounted");
@@ -290,12 +290,13 @@ void audioTask(void * Adt)
   //float bufferEntree[266];
   float bufferSortie[266];
   float bufferRes[1000]; //Mettre une autre taille, c'est pas la bonne
+  float samples_data_in[266];
 
   //init_buffer(bufferEntree, 266);  
   init_buffer(bufferSortie, 266);
 
   while (count < 1000) {
-    float samples_data_in[266]; //Adt.fBufferSize = 16; Adt.fNumInputs = 2;Adt.fNumOutputs = 2;
+    //Adt.fBufferSize = 16; Adt.fNumInputs = 2;Adt.fNumOutputs = 2;
     //float samples_data_out[266];
     
     // retrieving input buffer
@@ -339,8 +340,9 @@ void audioTask(void * Adt)
   }
 
   /*    Ecriture des résultats dans un fichier    */
-  FILE *dat=fopen(MOUNT_POINT"/son.dat", "a");
+  FILE *dat=fopen(MOUNT_POINT"/son.dat", "w");
   for(int i = 0; i < 1000; i++){
+    //printf("%f \n", bufferRes[i]);
     fprintf(dat, "%lf \n", bufferRes[i]);
   }
   fclose(dat);
