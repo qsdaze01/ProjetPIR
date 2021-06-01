@@ -95,18 +95,7 @@ void init_buffer(float* buffer, int taille){
   }
 }
 
-void recup_echantillon(float* buffer, int pointeur){
 
-  buffer[pointeur] = 0.0; //Méthode de Luc
-
-}
-
-int test_fin(){
-  //Je ne sais pas encore comment faire cette méthode donc là elle sert à rien pour l'instant
-
-  return(0);
-
-}
 void moyennage(float* donnees, float* res, int taille, int pointeur){
   float somme = 0;
   for(int i = 0; i < taille; i++){
@@ -150,14 +139,11 @@ void AudioInit(AudioDspType Adt){
 
 
 // starts audio task
-bool start(AudioDspType Adt)
-{
+bool start(AudioDspType Adt){
   
-  /* 
-        *******************************************************************************************************************
-        Chargement des paramètres pour la lecture de la carte SD
-        *******************************************************************************************************************
-  */
+  /* *******************************************************************************************************************
+    Chargement des paramètres pour la lecture de la carte SD
+     *******************************************************************************************************************/
 
     esp_err_t ret;
     // Options for mounting the filesystem.
@@ -244,8 +230,8 @@ bool start(AudioDspType Adt)
 
   if (!Adt.fRunning) {
     Adt.fRunning = true;  
-    xTaskCreatePinnedToCore(&audioTask, "Audio DSP Task", 10000, &Adt, 2, &(Adt.fHandle), 0);
-    
+    xTaskCreatePinnedToCore(&audioTask, "Audio DSP Task", 100000, &Adt, 2, &(Adt.fHandle), 0);
+    vTaskSuspend(NULL);
     // All done, unmount partition and disable SDMMC or SPI peripheral
     esp_vfs_fat_sdcard_unmount(mount_point, card);
     ESP_LOGI(TAG, "Card unmounted");
@@ -276,52 +262,42 @@ void stop(AudioDspType Adt)
 
 void audioTask(void * Adt)
 {
-	//Régler les problèmes de passage de variables
-  // inifinite loop
-  int count = 0;
-  /*      Traitement des données        */
+
+  /*      Déclaration des variables       */
 
   int pointeur = 0;
-  //int pointeurRes = 0;
+  int count = 0;
   Yin yin;
   float pitch;
 
   /*      Initialisation des buffers      */
-  //float bufferEntree[266];
+  
   float bufferSortie[266];
-  float bufferRes[1000]; //Mettre une autre taille, c'est pas la bonne
-  float samples_data_in[266];
-
-  //init_buffer(bufferEntree, 266);  
+  float bufferRes[10]; //Mettre une autre taille, c'est pas la bonne
+  int16_t samples_data_in[266];
+  float bufferEntree[266];
+  float temp[2660];
+ 
   init_buffer(bufferSortie, 266);
 
-  while (count < 1000) {
-  //printf("e\n");
-    //Adt.fBufferSize = 16; Adt.fNumInputs = 2;Adt.fNumOutputs = 2;
-    //float samples_data_out[266];
-    
-    // retrieving input buffer
+  /*    Boucle de traitement des données  */
+
+  while (count < 10) {
     size_t bytes_read = 0;
     i2s_read((i2s_port_t)0, &samples_data_in, 266*sizeof(int16_t), &bytes_read, portMAX_DELAY);
-    // processing buffers
-    /*for (int i = 0; i < 133; i++) {
-      // input buffer to float
-      float inSampleL = samples_data_in[i*2]*DIV_S16;
-      float inSampleR = samples_data_in[i*2+1]*DIV_S16;
-      
-      // copying to output buffer
-      samples_data_out[i*2] = inSampleL*MULT_S16;
-      samples_data_out[i*2+1] = inSampleR*MULT_S16;
-    }*/
+
+    for(int i = 0; i < 266; i++){
+      bufferEntree[i] = (float) (samples_data_in[i]);
+    }
 
     /*          Traitement          */
     Yin_init(&yin, 266, 0.08); //Je ne comprends pourquoi mais si on prend une confidence en dessous de 0.08 ça ne fonctionne plus
-    pitch = Yin_getPitch(&yin, samples_data_in); 
-    //buffer_length++;
+    pitch = Yin_getPitch(&yin, bufferEntree); 
+    free(yin.yinBuffer);  
     
     /*      Ajout des sorties au buffer     */
     bufferSortie[pointeur] = pitch;
-
+    temp[pointeur + 10*count] = bufferEntree[pointeur];
     
     /*          Moyennage         */
     if(pointeur == 265){
@@ -332,19 +308,21 @@ void audioTask(void * Adt)
     /*      Mise à jour du buffer         */
     if(pointeur == 265){
       pointeur = 0;
+      printf("%d\n", count);
     }else{
       pointeur += 1;
     }
     //printf("%d\n", count);
   }
-  //printf("b\n");
   /*    Ecriture des résultats dans un fichier    */
   FILE *dat=fopen(MOUNT_POINT"/son.dat", "w");
-  for(int i = 0; i < 1000; i++){
-    //printf("%f \n", bufferRes[i]);
-    fprintf(dat, "%lf \n", bufferRes[i]);
+  for(int i = 0; i < 2660; i++){
+    fprintf(dat, "%lf \n", temp[i]);
+    //fprintf(dat, "%lf \n", bufferRes[i]);
   }
+
   fclose(dat);
+  printf("a\n");
 
   // Task has to deleted itself beforee returning
   vTaskDelete(NULL);

@@ -18,7 +18,6 @@ void app_main(){
 	Adt.fHandle = NULL;
 	Adt.fRunning = false;
 
-	//audioDsp(48000,16);
   	AudioInit(Adt);
   	start(Adt);
 
