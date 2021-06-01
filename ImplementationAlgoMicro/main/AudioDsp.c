@@ -244,7 +244,8 @@ bool start(AudioDspType Adt)
 
   if (!Adt.fRunning) {
     Adt.fRunning = true;  
-    xTaskCreatePinnedToCore(&audioTaskHandler, "Audio DSP Task", 30000, &Adt, 24, &(Adt.fHandle), 0);
+    xTaskCreatePinnedToCore(&audioTask, "Audio DSP Task", 10000, &Adt, 2, &(Adt.fHandle), 0);
+    
     // All done, unmount partition and disable SDMMC or SPI peripheral
     esp_vfs_fat_sdcard_unmount(mount_point, card);
     ESP_LOGI(TAG, "Card unmounted");
@@ -278,7 +279,6 @@ void audioTask(void * Adt)
 	//Régler les problèmes de passage de variables
   // inifinite loop
   int count = 0;
-
   /*      Traitement des données        */
 
   int pointeur = 0;
@@ -296,13 +296,13 @@ void audioTask(void * Adt)
   init_buffer(bufferSortie, 266);
 
   while (count < 1000) {
+  //printf("e\n");
     //Adt.fBufferSize = 16; Adt.fNumInputs = 2;Adt.fNumOutputs = 2;
     //float samples_data_out[266];
     
     // retrieving input buffer
     size_t bytes_read = 0;
     i2s_read((i2s_port_t)0, &samples_data_in, 266*sizeof(int16_t), &bytes_read, portMAX_DELAY);
-    
     // processing buffers
     /*for (int i = 0; i < 133; i++) {
       // input buffer to float
@@ -318,7 +318,6 @@ void audioTask(void * Adt)
     Yin_init(&yin, 266, 0.08); //Je ne comprends pourquoi mais si on prend une confidence en dessous de 0.08 ça ne fonctionne plus
     pitch = Yin_getPitch(&yin, samples_data_in); 
     //buffer_length++;
-
     
     /*      Ajout des sorties au buffer     */
     bufferSortie[pointeur] = pitch;
@@ -336,9 +335,9 @@ void audioTask(void * Adt)
     }else{
       pointeur += 1;
     }
-
+    //printf("%d\n", count);
   }
-
+  //printf("b\n");
   /*    Ecriture des résultats dans un fichier    */
   FILE *dat=fopen(MOUNT_POINT"/son.dat", "w");
   for(int i = 0; i < 1000; i++){
@@ -349,10 +348,4 @@ void audioTask(void * Adt)
 
   // Task has to deleted itself beforee returning
   vTaskDelete(NULL);
-}
-
-// static cast of the audio task
-void audioTaskHandler(void * Adt)
-{
-  audioTask(Adt);
 }

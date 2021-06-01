@@ -1,4 +1,5 @@
 #include <stdint.h> /* For standard interger types (int16_t) */
+#include <stdio.h>
 #include <stdlib.h> /* For call to malloc */
 #include "Yin.h"
 
@@ -169,12 +170,18 @@ float Yin_parabolicInterpolation(Yin *yin, int16_t tauEstimate) {
 void Yin_init(Yin *yin, int16_t bufferSize, float threshold){
 	/* Initialise the fields of the Yin structure passed in */
 	yin->bufferSize = bufferSize;
-	yin->halfBufferSize = bufferSize / 2;
+	yin->halfBufferSize = (bufferSize / 2);
 	yin->probability = 0.0;
 	yin->threshold = threshold;
 
 	/* Allocate the autocorellation buffer and initialise it to zero */
 	yin->yinBuffer = (float *) malloc(sizeof(float)* yin->halfBufferSize);
+
+
+    if (yin->yinBuffer == 0){
+    	printf("insertionListeTriee: plus de place mémoire");
+    	exit(EXIT_FAILURE);
+    }
 
 	int16_t i;
 	for(i = 0; i < yin->halfBufferSize; i++){

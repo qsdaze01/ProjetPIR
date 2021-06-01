@@ -22,8 +22,8 @@ void app_main(){
   	AudioInit(Adt);
   	start(Adt);
 
-	// waiting forever
-  	vTaskSuspend(NULL);
+  	// waiting forever
+    vTaskSuspend(NULL);
 
-	return;
+	//return;
 }
