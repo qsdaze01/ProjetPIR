@@ -282,7 +282,7 @@ void audioTask(void * Adt)
   /*      Traitement des données        */
 
   int pointeur = 0;
-  int pointeurRes = 0;
+  //int pointeurRes = 0;
   Yin yin;
   float pitch;
 
@@ -291,19 +291,19 @@ void audioTask(void * Adt)
   float bufferSortie[266];
   float bufferRes[1000]; //Mettre une autre taille, c'est pas la bonne
 
-  init_buffer(bufferEntree, 266);  
+  //init_buffer(bufferEntree, 266);  
   init_buffer(bufferSortie, 266);
 
   while (count < 1000) {
     float samples_data_in[266]; //Adt.fBufferSize = 16; Adt.fNumInputs = 2;Adt.fNumOutputs = 2;
-    float samples_data_out[266];
+    //float samples_data_out[266];
     
     // retrieving input buffer
     size_t bytes_read = 0;
-    i2s_read((i2s_port_t)0, &samples_data_in, 2*sizeof(int16_t)*16, &bytes_read, portMAX_DELAY);
+    i2s_read((i2s_port_t)0, &samples_data_in, 266*sizeof(int16_t), &bytes_read, portMAX_DELAY);
     
     // processing buffers
-    for (int i = 0; i < 133; i++) {
+    /*for (int i = 0; i < 133; i++) {
       // input buffer to float
       float inSampleL = samples_data_in[i*2]*DIV_S16;
       float inSampleR = samples_data_in[i*2+1]*DIV_S16;
@@ -311,11 +311,11 @@ void audioTask(void * Adt)
       // copying to output buffer
       samples_data_out[i*2] = inSampleL*MULT_S16;
       samples_data_out[i*2+1] = inSampleR*MULT_S16;
-    }
+    }*/
 
     /*          Traitement          */
     Yin_init(&yin, 266, 0.08); //Je ne comprends pourquoi mais si on prend une confidence en dessous de 0.08 ça ne fonctionne plus
-    pitch = Yin_getPitch(&yin, samples_data_out); // Changer le type du buffer d'entrée en float
+    pitch = Yin_getPitch(&yin, samples_data_in); 
     //buffer_length++;
 
     
@@ -325,8 +325,8 @@ void audioTask(void * Adt)
     
     /*          Moyennage         */
     if(pointeur == 265){
-        moyennage(bufferSortie, bufferRes, 266, pointeurRes);
-        pointeurRes += 1;
+        moyennage(bufferSortie, bufferRes, 266, count);
+        count++;
     }
     
     /*      Mise à jour du buffer         */
@@ -335,8 +335,6 @@ void audioTask(void * Adt)
     }else{
       pointeur += 1;
     }
-
-    count++;
 
   }
 
