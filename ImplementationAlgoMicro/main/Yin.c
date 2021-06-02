@@ -179,7 +179,7 @@ void Yin_init(Yin *yin, int16_t bufferSize, float threshold){
 
 
     if (yin->yinBuffer == 0){
-    	printf("insertionListeTriee: plus de place mémoire");
+    	printf("buffer: plus de place mémoire");
     	exit(EXIT_FAILURE);
     }
 

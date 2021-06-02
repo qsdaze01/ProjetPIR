@@ -72,22 +72,6 @@ static const char *TAG = "example";
 #endif //CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
 #endif //USE_SPI_MODE
 
-struct wavfile //définit la structure de l'entête d un wav
-{
-    char        id[4];          // doit contenir "RIFF"
-    int         totallength;        // taille totale du fichier moins 8 bytes
-    char        wavefmt[8];     // doit etre "WAVEfmt "
-    int         format;             // 16 pour le format PCM
-    short       pcm;              // 1 for PCM format
-    short       channels;         // nombre de channels
-    int         frequency;          // frequence d echantillonage
-    int         bytes_per_second;   // nombre de bytes par secondes
-    short       bytes_by_capture;
-    short       bits_per_sample;  // nombre de bytes par echantillon
-    char        data[4];        // doit contenir "data"
-    int         bytes_in_data;      // nombre de bytes de la partie data
-};
-
 void init_buffer(float* buffer, int taille){
 
   for(int i = 0; i < taille; i++){
@@ -272,13 +256,13 @@ void audioTask(void * Adt)
 
   /*      Initialisation des buffers      */
   
-  float bufferSortie[266];
+  //float bufferSortie[266];
   float bufferRes[1000]; //Mettre une autre taille, c'est pas la bonne
   int16_t samples_data_in[266];
   float bufferEntree[266];
   //float temp[2660];
- 
-  init_buffer(bufferSortie, 266);
+
+  //init_buffer(bufferSortie, 1000);
 
   /*    Boucle de traitement des données  */
 
@@ -291,28 +275,23 @@ void audioTask(void * Adt)
     }
 
     /*          Traitement          */
-    Yin_init(&yin, 266, 0.5); //Je ne comprends pourquoi mais si on prend une confidence en dessous de 0.08 ça ne fonctionne plus
+    Yin_init(&yin, 266, 0.1); //Je ne comprends pourquoi mais si on prend une confidence en dessous de 0.08 ça ne fonctionne plus
     pitch = Yin_getPitch(&yin, bufferEntree); 
     free(yin.yinBuffer);  
     
+    bufferRes[count] = pitch;
+
     /*      Ajout des sorties au buffer     */
-    for(int i = 0; i < 266; i++){
+    /*for(int i = 0; i < 266; i++){
       bufferSortie[i] = pitch;
       //temp[i + 266*count] = pitch;
-    }
+    }*/
     
     
     /*          Moyennage         */
-    moyennage(bufferSortie, bufferRes, 266, count);
+    //moyennage(bufferSortie, bufferRes, 266, count);
     count++;
     
-    /*      Mise à jour du buffer         */
-    /*if(pointeur == 265){
-      pointeur = 0;
-      printf("%d\n", count);
-    }else{
-      pointeur += 1;
-    }*/
     //printf("%d\n", count);
   }
   

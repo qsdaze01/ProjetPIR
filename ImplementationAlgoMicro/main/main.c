@@ -12,7 +12,7 @@ void app_main(){
 	AudioDspType Adt;
 
 	Adt.fSampleRate = 48000;
-	Adt.fBufferSize = 16;
+	Adt.fBufferSize = 266;
 	Adt.fNumInputs = 2;
 	Adt.fNumOutputs = 2;
 	Adt.fHandle = NULL;
