@@ -4,10 +4,10 @@
 **Etapes du projet**
 - Faire toutes les installations nécessaires (voir guide d'install docLyrat.txt) [Fait]    
 - Récupérer les valeurs des échantillons du micro grâce à la LyraT pour les mettre dans une structure de données appropriée (Liste?) [En cours]    
-	-Conversion des fichiers C++ en C [En cours]        
+	-Conversion des fichiers C++ en C [Fait]       
 		-ES8388 [Fait]     
-		-AudioDSP [En cours, à tester]      
-- Appliquer un traitement sur ces échantillons de manière à obtenir les fréquences instantannées [Codé mais pas testé]     
+		-AudioDSP [Fait]      
+- Appliquer un traitement sur ces échantillons de manière à obtenir les fréquences instantannées [En cours]     
 - Produire un graphique des fréquences instantanées en fonction du temps et l'exporter    
 
 **Objectif final :**
