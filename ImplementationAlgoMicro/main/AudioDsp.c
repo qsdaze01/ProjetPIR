@@ -273,16 +273,16 @@ void audioTask(void * Adt)
   /*      Initialisation des buffers      */
   
   float bufferSortie[266];
-  float bufferRes[10]; //Mettre une autre taille, c'est pas la bonne
+  float bufferRes[1000]; //Mettre une autre taille, c'est pas la bonne
   int16_t samples_data_in[266];
   float bufferEntree[266];
-  float temp[2660];
+  //float temp[2660];
  
   init_buffer(bufferSortie, 266);
 
   /*    Boucle de traitement des données  */
 
-  while (count < 10) {
+  while (count < 1000) {
     size_t bytes_read = 0;
     i2s_read((i2s_port_t)0, &samples_data_in, 266*sizeof(int16_t), &bytes_read, portMAX_DELAY);
 
@@ -291,34 +291,37 @@ void audioTask(void * Adt)
     }
 
     /*          Traitement          */
-    Yin_init(&yin, 266, 0.08); //Je ne comprends pourquoi mais si on prend une confidence en dessous de 0.08 ça ne fonctionne plus
+    Yin_init(&yin, 266, 0.5); //Je ne comprends pourquoi mais si on prend une confidence en dessous de 0.08 ça ne fonctionne plus
     pitch = Yin_getPitch(&yin, bufferEntree); 
     free(yin.yinBuffer);  
     
     /*      Ajout des sorties au buffer     */
-    bufferSortie[pointeur] = pitch;
-    temp[pointeur + 10*count] = bufferEntree[pointeur];
-    
-    /*          Moyennage         */
-    if(pointeur == 265){
-        moyennage(bufferSortie, bufferRes, 266, count);
-        count++;
+    for(int i = 0; i < 266; i++){
+      bufferSortie[i] = pitch;
+      //temp[i + 266*count] = pitch;
     }
     
+    
+    /*          Moyennage         */
+    moyennage(bufferSortie, bufferRes, 266, count);
+    count++;
+    
     /*      Mise à jour du buffer         */
-    if(pointeur == 265){
+    /*if(pointeur == 265){
       pointeur = 0;
       printf("%d\n", count);
     }else{
       pointeur += 1;
-    }
+    }*/
     //printf("%d\n", count);
   }
+  
   /*    Ecriture des résultats dans un fichier    */
+
   FILE *dat=fopen(MOUNT_POINT"/son.dat", "w");
-  for(int i = 0; i < 2660; i++){
-    fprintf(dat, "%lf \n", temp[i]);
-    //fprintf(dat, "%lf \n", bufferRes[i]);
+  for(int i = 0; i < 1000; i++){
+    //fprintf(dat, "%lf \n", temp[i]);
+    fprintf(dat, "%lf \n", bufferRes[i]);
   }
 
   fclose(dat);
