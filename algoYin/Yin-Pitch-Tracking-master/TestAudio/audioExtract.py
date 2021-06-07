@@ -1,7 +1,7 @@
 import wave, struct
 import matplotlib.pyplot as plt
 
-filename = "OpenStrings.wav"
+filename = "A_Gaspard.wav"
 
 # Open the .wav files and extract all the frames
 waveFile = wave.open(filename, 'r')

@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 	printf("WARNING: this test has an absolute disregard for memory managment, hang tight this could hurt a little...\n");
 
 	while (pitch < 10 ) {
-		Yin_init(&yin, buffer_length, 0.08); //Je ne comprends pourquoi mais si on prend une confidence en dessous de 0.08 ça ne fonctionne plus
+		Yin_init(&yin, buffer_length, 0.17); //Je ne comprends pourquoi mais si on prend une confidence en dessous de 0.08 ça ne fonctionne plus
 		pitch = Yin_getPitch(&yin, audio);	
 		buffer_length++;
 	}
