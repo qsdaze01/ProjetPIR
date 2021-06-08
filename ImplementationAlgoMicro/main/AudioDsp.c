@@ -282,7 +282,7 @@ void audioTask(void * Adt)
   /*    Boucle de traitement des données  */
 
 
-  while (count < 1000) {
+  while (count < 100) {
     size_t bytes_read = 0;
     i2s_read((i2s_port_t)0, &samples_data_in, 1500*sizeof(int16_t), &bytes_read, portMAX_DELAY);
 
@@ -294,7 +294,8 @@ void audioTask(void * Adt)
     pitch = 0;
     buffer_length = 100;
 
-    while (pitch<10){
+    while (pitch<10 && buffer_length<250){
+      //printf("counterPitch : %d\n", buffer_length );
       Yin_init(&yin, buffer_length, 0.01);
       pitch = Yin_getPitch(&yin,bufferEntree);
       buffer_length++;
