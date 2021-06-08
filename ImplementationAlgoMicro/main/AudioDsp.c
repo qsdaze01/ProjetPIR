@@ -260,8 +260,8 @@ void audioTask(void * Adt)
   
   //float bufferSortie[266];
   float bufferRes[1000]; //Mettre une autre taille, c'est pas la bonne
-  int16_t samples_data_in[266];
-  float bufferEntree[266];
+  int16_t samples_data_in[1500];
+  float bufferEntree[1500];
   //float temp[2660];
 
   //init_buffer(bufferSortie, 1000);
@@ -273,7 +273,7 @@ void audioTask(void * Adt)
   }
 
   while (pitch<10){
-    Yin_init(&yin, buffer_length, 0.17);
+    Yin_init(&yin, buffer_length, 0.01);
     pitch = Yin_getPitch(&yin,audio_float);
     buffer_length++;
   }
@@ -282,15 +282,29 @@ void audioTask(void * Adt)
   /*    Boucle de traitement des données  */
 
 
-/*  while (count < 1000) {
+  while (count < 1000) {
     size_t bytes_read = 0;
-    i2s_read((i2s_port_t)0, &samples_data_in, 266*sizeof(int16_t), &bytes_read, portMAX_DELAY);
+    i2s_read((i2s_port_t)0, &samples_data_in, 1500*sizeof(int16_t), &bytes_read, portMAX_DELAY);
 
-    for(int i = 0; i < 266; i++){
+    for(int i = 0; i < 1500; i++){
       bufferEntree[i] = (float) (samples_data_in[i]);
+      //printf("%f\n",bufferEntree[i]);
     }
 
-*/
+    pitch = 0;
+    buffer_length = 100;
+
+    while (pitch<10){
+      Yin_init(&yin, buffer_length, 0.01);
+      pitch = Yin_getPitch(&yin,bufferEntree);
+      buffer_length++;
+    }
+    printf("Fondamentale : %f\n", pitch );
+    printf("Tour numéro %d\n", count );
+    count++;
+    free(yin.yinBuffer);
+  }
+
     /*          Traitement          */
 /*
     Yin_init(&yin, 266, 0.1); //Je ne comprends pourquoi mais si on prend une confidence en dessous de 0.08 ça ne fonctionne plus
@@ -317,7 +331,7 @@ void audioTask(void * Adt)
 
   FILE *dat=fopen(MOUNT_POINT"/son.dat", "w");
   for(int i = 0; i < 1000; i++){
-    //fprintf(dat, "%lf \n", temp[i]);
+    fprintf(dat, "%d \n", (int)bufferEntree[i]);
     //fprintf(dat, "%lf \n", bufferRes[i]);
   }
 
