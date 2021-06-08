@@ -299,11 +299,12 @@ void audioTask(void * Adt)
       Yin_init(&yin, buffer_length, 0.01);
       pitch = Yin_getPitch(&yin,bufferEntree);
       buffer_length++;
+      free(yin.yinBuffer);
     }
     printf("Fondamentale : %f\n", pitch );
     printf("Tour numéro %d\n", count );
     count++;
-    free(yin.yinBuffer);
+    
   }
 
     /*          Traitement          */

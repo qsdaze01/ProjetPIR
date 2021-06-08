@@ -180,7 +180,7 @@ void Yin_init(Yin *yin, int16_t bufferSize, float threshold){
 
     if (yin->yinBuffer == 0){
     	printf("buffer: plus de place mémoire");
-    	exit(EXIT_FAILURE);
+    	//exit(EXIT_FAILURE);
     }
 
 	int16_t i;
