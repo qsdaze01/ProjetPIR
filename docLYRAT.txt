@@ -17,3 +17,9 @@ A chaque redémarrage :
 -get_idf
 - idf.py set-target esp32
 -le port à mettre est /dev/ttyUSB0
+  
+  
+ ATTENTION :      
+
+Il ne faut pas démarrer la carte si le pin d'entrée est en mode 'jack'    
+Pour avoir le mode 'jack', il faut mettre le pin en mode 'micro' puis redémarrer la carte et ensuite mettre le code avec le pin en mode 'jack'     
