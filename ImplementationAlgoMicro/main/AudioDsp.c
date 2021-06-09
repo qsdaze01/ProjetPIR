@@ -272,16 +272,16 @@ void audioTask(void * Adt)
     }
 
     pitch = 0;
-    buffer_length = 100; //arbitrary length
+    int buffer_length = 100; //arbitrary length
 
-    while (pitch<10 && buffer_length<250){ // loop to avoid aberrant pitch values and limit calculation duration
+    while ((pitch<10 || pitch>25000) && buffer_length<250){ // loop to avoid aberrant pitch values and limit calculation duration
       Yin_init(&yin, buffer_length, 0.01); // init of yin object with buffer length and threshold parameters
       pitch = Yin_getPitch(&yin,bufferEntree);
       buffer_length++;
       free(yin.yinBuffer); // very important to avoid memory problems
     }
-    //printf("Fondamentale : %f\n", pitch );
-    //printf("Tour numéro %d\n", count );
+    printf("Fondamentale : %f\n", pitch );
+    printf("Tour numéro %d\n", count );
     count++;
     
   }
