@@ -298,6 +298,6 @@ void audioTask(void * Adt)
   fclose(dat);
   printf("a\n");
 
-  // Task has to deleted itself beforee returning
+  // Task has to deleted itself before returning
   vTaskDelete(NULL);
 }
