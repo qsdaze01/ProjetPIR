@@ -19,7 +19,8 @@ uint8_t initES(void)
   
   // ADC CONFIG
   writeReg(ES8388_ADCCONTROL1,136); // 1000 1000: mic preamps gains
-  writeReg(ES8388_ADCCONTROL3,10) // 0000 1010: passage en mono
+  writeReg(ES8388_ADCCONTROL3,130); // 1000 0010: passage en mono et entrée en jack
+  //writeReg(ES8388_ADCCONTROL3,10); // 0000 1010: passage en mono et entrée micro
   writeReg(ES8388_ADCCONTROL4,12); // 0000 1100: settings i2s config (16 bits)
   writeReg(ES8388_ADCCONTROL5,2); // 0000 0010: ADC MCLK at 256 fo ADC
   writeReg(ES8388_ADCCONTROL8,0); // 0000 0000: Digital volume control attenuates the signal in 0.5 dB incremental at 0dB for ADC L
