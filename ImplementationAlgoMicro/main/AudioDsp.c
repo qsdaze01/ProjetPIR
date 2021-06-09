@@ -225,6 +225,23 @@ void stop(AudioDspType Adt)
   }
 }
 
+
+float meanFrequency(float* values, int number_mean){
+  int meaner = 0;
+  float sum = 0;
+  for (int i=0 ; i<number_mean;i++){
+    if (values[i]>-1 && values[i]<20000){
+      sum += values[i];
+      meaner++;
+    }
+  }
+
+  if(meaner==0){
+    return 0.0;
+  }else{
+    return(sum/meaner);
+  }
+}
 /* Main task */
 void audioTask(void * Adt)
 {
@@ -233,36 +250,22 @@ void audioTask(void * Adt)
 
   int count = 0;
   Yin yin; // Yin object to be used later, implements Yin algorithm
-  float pitch = 0.0;
+  int number_mean = 5;
+  float temp_pitch = 0.0;
+  float mean_pitch = 0.0;
 
   /*      Buffers initialization      */
   
  // float bufferRes[1000]; //Mettre une autre taille, c'est pas la bonne
   int16_t samples_data_in[1500]; //samples to be read by the microphones
   float bufferEntree[1500]; // samples casted in float
+  float bufferOut[number_mean];
   //float temp[2660];
-
-
-  /*       Test with already written samples, accessible from the array audio variable from the audioData.h header     */
-
-  /*int array_length = sizeof(audio)/sizeof(int16_t);
-  float audio_float[array_length];
-  for (int i = 0; i<array_length;i++){
-    audio_float[i]=(float) audio[i];
-  }
-
-  int buffer_length = 100;
-  while (pitch<10){
-    Yin_init(&yin, buffer_length, 0.01);
-    pitch = Yin_getPitch(&yin,audio_float);
-    buffer_length++;
-  }
-  printf("%f\n",pitch );*/
 
   /*    Pitch Tracking using the samples coming from the microphones   */
 
-
-  while (count < 100) { // arbitrary condition, could very well be a "while (true)"
+  FILE *dat=fopen(MOUNT_POINT"/son.dat", "a");
+  while (count<100) { // arbitrary condition, could very well be a "while (true)"
     size_t bytes_read = 0;
     i2s_read((i2s_port_t)0, &samples_data_in, 1500*sizeof(int16_t), &bytes_read, portMAX_DELAY); // Reads the samples from the mic, see doc for parameters
 
@@ -271,28 +274,24 @@ void audioTask(void * Adt)
       //printf("%f\n",bufferEntree[i]);
     }
 
-    pitch = 0;
     int buffer_length = 100; //arbitrary length
 
-    while ((pitch<10 || pitch>25000) && buffer_length<250){ // loop to avoid aberrant pitch values and limit calculation duration
+    while ((temp_pitch<10 || temp_pitch>15000) && buffer_length<250){ // loop to avoid aberrant pitch values and limit calculation duration
       Yin_init(&yin, buffer_length, 0.01); // init of yin object with buffer length and threshold parameters
-      pitch = Yin_getPitch(&yin,bufferEntree);
+      temp_pitch = Yin_getPitch(&yin,bufferEntree);
       buffer_length++;
       free(yin.yinBuffer); // very important to avoid memory problems
     }
-    printf("Fondamentale : %f\n", pitch );
-    printf("Tour numéro %d\n", count );
-    count++;
-    
-  }
-
-
-  /*    Results writing to a file    */
-
-  FILE *dat=fopen(MOUNT_POINT"/son.dat", "w");
-  for(int i = 0; i < 1000; i++){
-    fprintf(dat, "%d \n", (int)bufferEntree[i]);
-    //fprintf(dat, "%lf \n", bufferRes[i]);
+    bufferOut[count%number_mean] = temp_pitch;
+    //printf("Fondamentale : %f\n", temp_pitch );
+    temp_pitch = 0.0;
+    //printf("Tour numéro %d\n", count );
+    if (count%number_mean == (number_mean-1)){
+      mean_pitch = meanFrequency(bufferOut, number_mean);
+      fprintf(dat, "%d \n", (int) (mean_pitch/2));
+      mean_pitch=0;
+    }
+    count++; 
   }
 
   fclose(dat);
