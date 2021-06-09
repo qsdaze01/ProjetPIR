@@ -74,23 +74,6 @@ static const char *TAG = "example";
 #endif //CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
 #endif //USE_SPI_MODE
 
-void init_buffer(float* buffer, int taille){
-
-  for(int i = 0; i < taille; i++){
-    buffer[i] = 0.0;
-  }
-}
-
-
-void moyennage(float* donnees, float* res, int taille, int pointeur){
-  float somme = 0;
-  for(int i = 0; i < taille; i++){
-    somme += donnees[i];
-  }
-
-  res[pointeur] = somme/((float)(taille));
-}
-
 void AudioInit(AudioDspType Adt){
   // config i2s pin numbers
   //i2s_pin_config_t pin_config;
@@ -128,7 +111,7 @@ void AudioInit(AudioDspType Adt){
 bool start(AudioDspType Adt){
   
   /* *******************************************************************************************************************
-    Chargement des paramètres pour la lecture de la carte SD
+    Loading of the SD card parameters
      *******************************************************************************************************************/
 
     esp_err_t ret;
@@ -225,10 +208,6 @@ bool start(AudioDspType Adt){
     //deinitialize the bus after all devices are removed
     spi_bus_free(host.slot);
 #endif
-
-    printf("Fin \n");
-    sleep(5);
-
     return true;
   } 
   else {
@@ -246,90 +225,69 @@ void stop(AudioDspType Adt)
   }
 }
 
+/* Main task */
 void audioTask(void * Adt)
 {
 
-  /*      Déclaration des variables       */
+  /*      Variables declaration       */
 
-  int pointeur = 0;
   int count = 0;
-  Yin yin;
+  Yin yin; // Yin object to be used later, implements Yin algorithm
   float pitch = 0.0;
 
-  /*      Initialisation des buffers      */
+  /*      Buffers initialization      */
   
-  //float bufferSortie[266];
-  float bufferRes[1000]; //Mettre une autre taille, c'est pas la bonne
-  int16_t samples_data_in[1500];
-  float bufferEntree[1500];
+ // float bufferRes[1000]; //Mettre une autre taille, c'est pas la bonne
+  int16_t samples_data_in[1500]; //samples to be read by the microphones
+  float bufferEntree[1500]; // samples casted in float
   //float temp[2660];
 
-  //init_buffer(bufferSortie, 1000);
-  int buffer_length = 100;
-  int array_length = sizeof(audio)/sizeof(int16_t);
+
+  /*       Test with already written samples, accessible from the array audio variable from the audioData.h header     */
+
+  /*int array_length = sizeof(audio)/sizeof(int16_t);
   float audio_float[array_length];
   for (int i = 0; i<array_length;i++){
     audio_float[i]=(float) audio[i];
   }
 
+  int buffer_length = 100;
   while (pitch<10){
     Yin_init(&yin, buffer_length, 0.01);
     pitch = Yin_getPitch(&yin,audio_float);
     buffer_length++;
   }
-  printf("%f\n",pitch );
+  printf("%f\n",pitch );*/
 
-  /*    Boucle de traitement des données  */
+  /*    Pitch Tracking using the samples coming from the microphones   */
 
 
-  while (count < 100) {
+  while (count < 100) { // arbitrary condition, could very well be a "while (true)"
     size_t bytes_read = 0;
-    i2s_read((i2s_port_t)0, &samples_data_in, 1500*sizeof(int16_t), &bytes_read, portMAX_DELAY);
+    i2s_read((i2s_port_t)0, &samples_data_in, 1500*sizeof(int16_t), &bytes_read, portMAX_DELAY); // Reads the samples from the mic, see doc for parameters
 
     for(int i = 0; i < 1500; i++){
-      bufferEntree[i] = (float) (samples_data_in[i]);
+      bufferEntree[i] = (float) (samples_data_in[i]); // casting samples to float
       //printf("%f\n",bufferEntree[i]);
     }
 
     pitch = 0;
-    buffer_length = 100;
+    buffer_length = 100; //arbitrary length
 
-    while (pitch<10 && buffer_length<250){
-      //printf("counterPitch : %d\n", buffer_length );
-      Yin_init(&yin, buffer_length, 0.01);
+    while (pitch<10 && buffer_length<250){ // loop to avoid aberrant pitch values and limit calculation duration
+      Yin_init(&yin, buffer_length, 0.01); // init of yin object with buffer length and threshold parameters
       pitch = Yin_getPitch(&yin,bufferEntree);
       buffer_length++;
-      free(yin.yinBuffer);
+      free(yin.yinBuffer); // very important to avoid memory problems
     }
-    printf("Fondamentale : %f\n", pitch );
-    printf("Tour numéro %d\n", count );
+    //printf("Fondamentale : %f\n", pitch );
+    //printf("Tour numéro %d\n", count );
     count++;
     
   }
 
-    /*          Traitement          */
-/*
-    Yin_init(&yin, 266, 0.1); //Je ne comprends pourquoi mais si on prend une confidence en dessous de 0.08 ça ne fonctionne plus
-    pitch = Yin_getPitch(&yin, bufferEntree); 
-    free(yin.yinBuffer);  
-    
-    bufferRes[count] = pitch;
-*/
-    /*      Ajout des sorties au buffer     */
-    /*for(int i = 0; i < 266; i++){
-      bufferSortie[i] = pitch;
-      //temp[i + 266*count] = pitch;
-    }*/
-        
-    /*          Moyennage         */
-/*
-    //moyennage(bufferSortie, bufferRes, 266, count);
-    count++;
-    
-    //printf("%d\n", count);
-  }
-*/  
-  /*    Ecriture des résultats dans un fichier    */
+
+  /*    Results writing to a file    */
 
   FILE *dat=fopen(MOUNT_POINT"/son.dat", "w");
   for(int i = 0; i < 1000; i++){
@@ -340,6 +298,6 @@ void audioTask(void * Adt)
   fclose(dat);
   printf("a\n");
 
-  // Task has to deleted itself beforee returning
+  // Task has to deleted itself before returning
   vTaskDelete(NULL);
 }
