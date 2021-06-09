@@ -18,6 +18,8 @@
 #include "driver/i2s.h"
 #include <unistd.h>
 
+#include "audioData.h"
+
 #define PI 3.1415926535897931
 #define MULT_S16 32767
 #define DIV_S16 0.0000305185
@@ -252,55 +254,87 @@ void audioTask(void * Adt)
   int pointeur = 0;
   int count = 0;
   Yin yin;
-  float pitch;
+  float pitch = 0.0;
 
   /*      Initialisation des buffers      */
   
   //float bufferSortie[266];
   float bufferRes[1000]; //Mettre une autre taille, c'est pas la bonne
-  int16_t samples_data_in[266];
-  float bufferEntree[266];
+  int16_t samples_data_in[1500];
+  float bufferEntree[1500];
   //float temp[2660];
 
   //init_buffer(bufferSortie, 1000);
+  int buffer_length = 100;
+  int array_length = sizeof(audio)/sizeof(int16_t);
+  float audio_float[array_length];
+  for (int i = 0; i<array_length;i++){
+    audio_float[i]=(float) audio[i];
+  }
+
+  while (pitch<10){
+    Yin_init(&yin, buffer_length, 0.01);
+    pitch = Yin_getPitch(&yin,audio_float);
+    buffer_length++;
+  }
+  printf("%f\n",pitch );
 
   /*    Boucle de traitement des données  */
 
-  while (count < 1000) {
-    size_t bytes_read = 0;
-    i2s_read((i2s_port_t)0, &samples_data_in, 266*sizeof(int16_t), &bytes_read, portMAX_DELAY);
 
-    for(int i = 0; i < 266; i++){
+  while (count < 100) {
+    size_t bytes_read = 0;
+    i2s_read((i2s_port_t)0, &samples_data_in, 1500*sizeof(int16_t), &bytes_read, portMAX_DELAY);
+
+    for(int i = 0; i < 1500; i++){
       bufferEntree[i] = (float) (samples_data_in[i]);
+      //printf("%f\n",bufferEntree[i]);
     }
 
+    pitch = 0;
+    buffer_length = 100;
+
+    while (pitch<10 && buffer_length<250){
+      //printf("counterPitch : %d\n", buffer_length );
+      Yin_init(&yin, buffer_length, 0.01);
+      pitch = Yin_getPitch(&yin,bufferEntree);
+      buffer_length++;
+      free(yin.yinBuffer);
+    }
+    printf("Fondamentale : %f\n", pitch );
+    printf("Tour numéro %d\n", count );
+    count++;
+    
+  }
+
     /*          Traitement          */
+/*
     Yin_init(&yin, 266, 0.1); //Je ne comprends pourquoi mais si on prend une confidence en dessous de 0.08 ça ne fonctionne plus
     pitch = Yin_getPitch(&yin, bufferEntree); 
     free(yin.yinBuffer);  
     
     bufferRes[count] = pitch;
-
+*/
     /*      Ajout des sorties au buffer     */
     /*for(int i = 0; i < 266; i++){
       bufferSortie[i] = pitch;
       //temp[i + 266*count] = pitch;
     }*/
-    
-    
+        
     /*          Moyennage         */
+/*
     //moyennage(bufferSortie, bufferRes, 266, count);
     count++;
     
     //printf("%d\n", count);
   }
-  
+*/  
   /*    Ecriture des résultats dans un fichier    */
 
   FILE *dat=fopen(MOUNT_POINT"/son.dat", "w");
   for(int i = 0; i < 1000; i++){
-    //fprintf(dat, "%lf \n", temp[i]);
-    fprintf(dat, "%lf \n", bufferRes[i]);
+    fprintf(dat, "%d \n", (int)bufferEntree[i]);
+    //fprintf(dat, "%lf \n", bufferRes[i]);
   }
 
   fclose(dat);
