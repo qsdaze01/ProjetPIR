@@ -263,6 +263,28 @@ void convolve (double *p_coeffs, int p_coeffs_n, double *p_in, double *p_out, in
   }
 }
 
+double* convolve2(double h[], double x[], int lenH, int lenX, int* lenY)
+{
+  int nconv = lenH+lenX-1;
+  (*lenY) = nconv;
+  int i,j,h_start,x_start,x_end;
+
+  double *y = (double*) calloc(nconv, sizeof(double));
+
+  for (i=0; i<nconv; i++)
+  {
+    x_start = MAX(0,i-lenH+1);
+    x_end   = MIN(i+1,lenX);
+    h_start = MIN(i,lenH-1);
+    for(j=x_start; j<x_end; j++)
+    {
+      y[i] += h[h_start--]*x[j];
+    }
+  }
+  return y;
+}
+
+
 /* Main task */
 void audioTask(void * Adt)
 {
@@ -281,12 +303,13 @@ void audioTask(void * Adt)
   int16_t samples_data_in[1500]; //samples to be read by the microphones
   double bufferEntree[1500]; // samples casted in float
   double bufferOut[number_mean];
-  double bufferFiltre[1500];
+  //double bufferFiltre[1500];
+  int lenReturn;
   //float temp[2660];
 
   /*    Pitch Tracking using the samples coming from the microphones   */
 
-  FILE *dat=fopen(MOUNT_POINT"/son.dat", "a");
+  FILE *dat=fopen(MOUNT_POINT"/son.dat", "w");
   while (count<100) { // arbitrary condition, could very well be a "while (true)"
     size_t bytes_read = 0;
     i2s_read((i2s_port_t)0, &samples_data_in, 1500*sizeof(int16_t), &bytes_read, portMAX_DELAY); // Reads the samples from the mic, see doc for parameters
@@ -295,8 +318,13 @@ void audioTask(void * Adt)
       bufferEntree[i] = (double) (samples_data_in[i]); // casting samples to float
       //printf("%f\n",bufferEntree[i]);
     }
-    convolve(coef, nbCoef, bufferEntree, bufferFiltre, 1500);
 
+    double *bufferFiltre = convolve2(coef, bufferEntree, nbCoef, 1500, &lenReturn);
+    for(int j=0; j<1500 ; j++){
+      fprintf(dat, "%d \n", (int) (bufferFiltre[j]));
+    }
+    free(bufferFiltre);
+/*
     int buffer_length = 100; //arbitrary length
 
     while ((temp_pitch<10 || temp_pitch>15000) && buffer_length<250){ // loop to avoid aberrant pitch values and limit calculation duration
@@ -313,7 +341,7 @@ void audioTask(void * Adt)
       mean_pitch = meanFrequency(bufferOut, number_mean);
       fprintf(dat, "%d \n", (int) (mean_pitch/2));
       mean_pitch=0;
-    }
+    }*/
     count++; 
   }
 
