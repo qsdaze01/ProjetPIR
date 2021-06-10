@@ -310,7 +310,7 @@ void audioTask(void * Adt)
   /*    Pitch Tracking using the samples coming from the microphones   */
 
   FILE *dat=fopen(MOUNT_POINT"/son.dat", "w");
-  while (count<100) { // arbitrary condition, could very well be a "while (true)"
+  while (count<10) { // arbitrary condition, could very well be a "while (true)"
     size_t bytes_read = 0;
     i2s_read((i2s_port_t)0, &samples_data_in, 1500*sizeof(int16_t), &bytes_read, portMAX_DELAY); // Reads the samples from the mic, see doc for parameters
 
@@ -320,16 +320,18 @@ void audioTask(void * Adt)
     }
 
     double *bufferFiltre = convolve2(coef, bufferEntree, nbCoef, 1500, &lenReturn);
+  /*
     for(int j=0; j<1500 ; j++){
       fprintf(dat, "%d \n", (int) (bufferFiltre[j]));
-    }
-    free(bufferFiltre);
-/*
+      //fprintf(dat, "%d\n", (int) (bufferEntree[j]));
+    }*/
+
     int buffer_length = 100; //arbitrary length
 
     while ((temp_pitch<10 || temp_pitch>15000) && buffer_length<250){ // loop to avoid aberrant pitch values and limit calculation duration
       Yin_init(&yin, buffer_length, 0.01); // init of yin object with buffer length and threshold parameters
-      temp_pitch = Yin_getPitch(&yin,bufferEntree);
+      temp_pitch = Yin_getPitch(&yin,bufferFiltre);
+      //temp_pitch = Yin_getPitch(&yin,bufferEntree);
       buffer_length++;
       free(yin.yinBuffer); // very important to avoid memory problems
     }
@@ -341,7 +343,8 @@ void audioTask(void * Adt)
       mean_pitch = meanFrequency(bufferOut, number_mean);
       fprintf(dat, "%d \n", (int) (mean_pitch/2));
       mean_pitch=0;
-    }*/
+    }
+    free(bufferFiltre);
     count++; 
   }
 
