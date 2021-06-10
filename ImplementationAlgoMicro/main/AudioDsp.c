@@ -19,6 +19,7 @@
 #include <unistd.h>
 
 #include "audioData.h"
+#include "filter.h"
 
 #define PI 3.1415926535897931
 #define MULT_S16 32767
@@ -226,9 +227,9 @@ void stop(AudioDspType Adt)
 }
 
 
-float meanFrequency(float* values, int number_mean){
+double meanFrequency(double* values, int number_mean){
   int meaner = 0;
-  float sum = 0;
+  double sum = 0;
   for (int i=0 ; i<number_mean;i++){
     if (values[i]>-1 && values[i]<20000){
       sum += values[i];
@@ -242,6 +243,26 @@ float meanFrequency(float* values, int number_mean){
     return(sum/meaner);
   }
 }
+
+void convolve (double *p_coeffs, int p_coeffs_n, double *p_in, double *p_out, int n){
+  int i, j, k;
+  double tmp;
+
+  for (k = 0; k < n; k++){  // position in output
+    tmp = 0;
+
+    for (i = 0; i < p_coeffs_n; i++){  // position in coefficients array
+      j = k - i;  // position in input
+
+      if (j >= 0){  // bounds check for input buffer
+        tmp += p_coeffs [k] * p_in [j];
+      }
+    }
+
+    p_out [i] = tmp;
+  }
+}
+
 /* Main task */
 void audioTask(void * Adt)
 {
@@ -251,15 +272,16 @@ void audioTask(void * Adt)
   int count = 0;
   Yin yin; // Yin object to be used later, implements Yin algorithm
   int number_mean = 5;
-  float temp_pitch = 0.0;
-  float mean_pitch = 0.0;
+  double temp_pitch = 0.0;
+  double mean_pitch = 0.0;
 
   /*      Buffers initialization      */
   
  // float bufferRes[1000]; //Mettre une autre taille, c'est pas la bonne
   int16_t samples_data_in[1500]; //samples to be read by the microphones
-  float bufferEntree[1500]; // samples casted in float
-  float bufferOut[number_mean];
+  double bufferEntree[1500]; // samples casted in float
+  double bufferOut[number_mean];
+  double bufferFiltre[1500];
   //float temp[2660];
 
   /*    Pitch Tracking using the samples coming from the microphones   */
@@ -270,9 +292,10 @@ void audioTask(void * Adt)
     i2s_read((i2s_port_t)0, &samples_data_in, 1500*sizeof(int16_t), &bytes_read, portMAX_DELAY); // Reads the samples from the mic, see doc for parameters
 
     for(int i = 0; i < 1500; i++){
-      bufferEntree[i] = (float) (samples_data_in[i]); // casting samples to float
+      bufferEntree[i] = (double) (samples_data_in[i]); // casting samples to float
       //printf("%f\n",bufferEntree[i]);
     }
+    convolve(coef, nbCoef, bufferEntree, bufferFiltre, 1500);
 
     int buffer_length = 100; //arbitrary length
 
