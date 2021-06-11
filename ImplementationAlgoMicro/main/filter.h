@@ -5,7 +5,7 @@
 #define nbCoef 49
 
 
-double coef[nbCoef] = {
+float coef[nbCoef] = {
 	-0.000152979473468887,
 	-0.00195519007788544,
 	-0.00669971341588191,

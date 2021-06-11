@@ -23,7 +23,7 @@ uint8_t initES(void)
   writeReg(ES8388_ADCCONTROL5,2); // 0000 0010: ADC MCLK at 256 fo ADC
   writeReg(ES8388_ADCCONTROL8,0); // 0000 0000: Digital volume control attenuates the signal in 0.5 dB incremental at 0dB for ADC L
   writeReg(ES8388_ADCCONTROL9,0); // 0000 0000: Digital volume control attenuates the signal in 0.5 dB incremental at 0dB for ADC R
-  writeReg(ES8388_ADCCONTROL10,255); // 0000 1100: PGA gain
+  writeReg(ES8388_ADCCONTROL10,255); // 1111 1111: PGA gain
   
   // DAC CONFIG
   writeReg(ES8388_DACCONTROL1,24); // 0001 1000: i2s config (16 bits)

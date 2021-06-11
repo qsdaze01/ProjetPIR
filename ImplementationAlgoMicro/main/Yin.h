@@ -13,7 +13,7 @@
 typedef struct _Yin {
 	int16_t bufferSize;			/**< Size of the audio buffer to be analysed */
 	int16_t halfBufferSize;		/**< Half the buffer length */
-	double* yinBuffer;		/**< Buffer that stores the results of the intermediate processing steps of the algorithm */
+	float* yinBuffer;		/**< Buffer that stores the results of the intermediate processing steps of the algorithm */
 	float probability;		/**< Probability that the pitch found is correct as a decimal (i.e 0.85 is 85%) */
 	float threshold;		/**< Allowed uncertainty in the result as a decimal (i.e 0.15 is 15%) */
 } Yin;
@@ -32,7 +32,7 @@ void Yin_init(Yin *yin, int16_t bufferSize, float threshold);
  * @param  buffer Buffer of samples to analyse
  * @return        Fundamental frequency of the signal in Hz. Returns -1 if pitch can't be found
  */
-double Yin_getPitch(Yin *yin, double* buffer);
+float Yin_getPitch(Yin *yin, float* buffer);
 
 /**
  * Certainty of the pitch found 

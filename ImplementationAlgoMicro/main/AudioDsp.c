@@ -17,6 +17,7 @@
 #include "AudioDsp.h"
 #include "driver/i2s.h"
 #include <unistd.h>
+#include <time.h>
 
 #include "audioData.h"
 #include "filter.h"
@@ -300,56 +301,58 @@ void audioTask(void * Adt)
   /*      Buffers initialization      */
   
  // float bufferRes[1000]; //Mettre une autre taille, c'est pas la bonne
-  int16_t samples_data_in[1500]; //samples to be read by the microphones
-  float bufferEntree[1500]; // samples casted in float
+  int16_t samples_data_in[2500]; //samples to be read by the microphones
+  float bufferEntree[2500]; // samples casted in float
   float bufferOut[number_mean];
-  //float bufferFiltre[1500];
+  //float bufferFiltre[2500];
   int lenReturn;
   //float temp[2660];
 
   /*    Pitch Tracking using the samples coming from the microphones   */
-
+  time_t begin = time(NULL);
   FILE *dat=fopen(MOUNT_POINT"/son.dat", "w");
   while (count<10) { // arbitrary condition, could very well be a "while (true)"
     size_t bytes_read = 0;
-    i2s_read((i2s_port_t)0, &samples_data_in, 1500*sizeof(int16_t), &bytes_read, portMAX_DELAY); // Reads the samples from the mic, see doc for parameters
+    i2s_read((i2s_port_t)0, &samples_data_in, 2500*sizeof(int16_t), &bytes_read, portMAX_DELAY); // Reads the samples from the mic, see doc for parameters
 
-    for(int i = 0; i < 1500; i++){
+    for(int i = 0; i < 2500; i++){
       bufferEntree[i] = (float) (samples_data_in[i]); // casting samples to float
       //printf("%f\n",bufferEntree[i]);
     }
 
-    float *bufferFiltre = convolve2(coef, bufferEntree, nbCoef, 1500, &lenReturn);
+    float *bufferFiltre = convolve2(coef, bufferEntree, nbCoef, 2500, &lenReturn);
   /*
-    for(int j=0; j<1500 ; j++){
+    for(int j=0; j<2500 ; j++){
       fprintf(dat, "%d \n", (int) (bufferFiltre[j]));
       //fprintf(dat, "%d\n", (int) (bufferEntree[j]));
     }*/
 
-    int buffer_length = 100; //arbitrary length
+    int buffer_length = 500; //arbitrary length
 
-    while ((temp_pitch<10 || temp_pitch>15000) && buffer_length<250){ // loop to avoid aberrant pitch values and limit calculation duration
-      Yin_init(&yin, buffer_length, 0.01); // init of yin object with buffer length and threshold parameters
+    while ((temp_pitch<10 || temp_pitch>15000) && buffer_length<2500){ // loop to avoid aberrant pitch values and limit calculation duration
+      Yin_init(&yin, buffer_length, 0.1); // init of yin object with buffer length and threshold parameters
       temp_pitch = Yin_getPitch(&yin,bufferFiltre);
       //temp_pitch = Yin_getPitch(&yin,bufferEntree);
-      buffer_length++;
+      buffer_length += 500;
       free(yin.yinBuffer); // very important to avoid memory problems
     }
     bufferOut[count%number_mean] = temp_pitch;
-    //printf("Fondamentale : %f\n", temp_pitch );
+    printf("Fondamentale : %f\n", temp_pitch );
     temp_pitch = 0.0;
-    //printf("Tour numéro %d\n", count );
+    printf("Tour numéro %d\n", count );
     if (count%number_mean == (number_mean-1)){
       mean_pitch = meanFrequency(bufferOut, number_mean);
       fprintf(dat, "%d \n", (int) (mean_pitch/2));
       mean_pitch=0;
     }
+    i2s_write((i2s_port_t)0, &samples_data_in, 2500*sizeof(int16_t), &bytes_read, portMAX_DELAY);
     free(bufferFiltre);
     count++; 
   }
-
   fclose(dat);
-  printf("a\n");
+  time_t end = time(NULL);
+  unsigned long secondes = (unsigned long) difftime( end, begin );
+  printf( "Finished in %ld sec\n", secondes ); 
 
   // Task has to deleted itself before returning
   vTaskDelete(NULL);
