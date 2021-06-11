@@ -227,9 +227,9 @@ void stop(AudioDspType Adt)
 }
 
 
-double meanFrequency(double* values, int number_mean){
+float meanFrequency(float* values, int number_mean){
   int meaner = 0;
-  double sum = 0;
+  float sum = 0;
   for (int i=0 ; i<number_mean;i++){
     if (values[i]>-1 && values[i]<20000){
       sum += values[i];
@@ -244,9 +244,9 @@ double meanFrequency(double* values, int number_mean){
   }
 }
 
-void convolve (double *p_coeffs, int p_coeffs_n, double *p_in, double *p_out, int n){
+void convolve (float *p_coeffs, int p_coeffs_n, float *p_in, float *p_out, int n){
   int i, j, k;
-  double tmp;
+  float tmp;
 
   for (k = 0; k < n; k++){  // position in output
     tmp = 0;
@@ -263,13 +263,13 @@ void convolve (double *p_coeffs, int p_coeffs_n, double *p_in, double *p_out, in
   }
 }
 
-double* convolve2(double h[], double x[], int lenH, int lenX, int* lenY)
+float* convolve2(float h[], float x[], int lenH, int lenX, int* lenY)
 {
   int nconv = lenH+lenX-1;
   (*lenY) = nconv;
   int i,j,h_start,x_start,x_end;
 
-  double *y = (double*) calloc(nconv, sizeof(double));
+  float *y = (float*) calloc(nconv, sizeof(float));
 
   for (i=0; i<nconv; i++)
   {
@@ -294,16 +294,16 @@ void audioTask(void * Adt)
   int count = 0;
   Yin yin; // Yin object to be used later, implements Yin algorithm
   int number_mean = 5;
-  double temp_pitch = 0.0;
-  double mean_pitch = 0.0;
+  float temp_pitch = 0.0;
+  float mean_pitch = 0.0;
 
   /*      Buffers initialization      */
   
  // float bufferRes[1000]; //Mettre une autre taille, c'est pas la bonne
   int16_t samples_data_in[1500]; //samples to be read by the microphones
-  double bufferEntree[1500]; // samples casted in float
-  double bufferOut[number_mean];
-  //double bufferFiltre[1500];
+  float bufferEntree[1500]; // samples casted in float
+  float bufferOut[number_mean];
+  //float bufferFiltre[1500];
   int lenReturn;
   //float temp[2660];
 
@@ -315,11 +315,11 @@ void audioTask(void * Adt)
     i2s_read((i2s_port_t)0, &samples_data_in, 1500*sizeof(int16_t), &bytes_read, portMAX_DELAY); // Reads the samples from the mic, see doc for parameters
 
     for(int i = 0; i < 1500; i++){
-      bufferEntree[i] = (double) (samples_data_in[i]); // casting samples to float
+      bufferEntree[i] = (float) (samples_data_in[i]); // casting samples to float
       //printf("%f\n",bufferEntree[i]);
     }
 
-    double *bufferFiltre = convolve2(coef, bufferEntree, nbCoef, 1500, &lenReturn);
+    float *bufferFiltre = convolve2(coef, bufferEntree, nbCoef, 1500, &lenReturn);
   /*
     for(int j=0; j<1500 ; j++){
       fprintf(dat, "%d \n", (int) (bufferFiltre[j]));

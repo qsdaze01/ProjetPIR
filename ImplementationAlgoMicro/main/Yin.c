@@ -14,10 +14,10 @@
  * This is the Yin algorithms tweak on autocorellation. Read http://audition.ens.fr/adc/pdf/2002_JASA_YIN.pdf
  * for more details on what is in here and why it's done this way.
  */
-void Yin_difference(Yin *yin, double* buffer){
+void Yin_difference(Yin *yin, float* buffer){
 	int16_t i;
 	int16_t tau;
-	double delta;
+	float delta;
 
 	/* Calculate the difference for difference shift values (tau) for the half of the samples */
 	for(tau = 0 ; tau < yin->halfBufferSize; tau++){
@@ -41,7 +41,7 @@ void Yin_difference(Yin *yin, double* buffer){
  */
 void Yin_cumulativeMeanNormalizedDifference(Yin *yin){
 	int16_t tau;
-	double runningSum = 0;
+	float runningSum = 0;
 	yin->yinBuffer[0] = 1;
 
 	/* Sum all the values in the autocorellation buffer and nomalise the result, replacing
@@ -99,8 +99,8 @@ int16_t Yin_absoluteThreshold(Yin *yin){
  * As we only autocorellated using integer shifts we should check that there isn't a better fractional 
  * shift value.
  */
-double Yin_parabolicInterpolation(Yin *yin, int16_t tauEstimate) {
-	double betterTau;
+float Yin_parabolicInterpolation(Yin *yin, int16_t tauEstimate) {
+	float betterTau;
 	int16_t x0;
 	int16_t x2;
 	
@@ -138,7 +138,7 @@ double Yin_parabolicInterpolation(Yin *yin, int16_t tauEstimate) {
 		}
 	} 
 	else {
-		double s0, s1, s2;
+		float s0, s1, s2;
 		s0 = yin->yinBuffer[x0];
 		s1 = yin->yinBuffer[tauEstimate];
 		s2 = yin->yinBuffer[x2];
@@ -175,7 +175,7 @@ void Yin_init(Yin *yin, int16_t bufferSize, float threshold){
 	yin->threshold = threshold;
 
 	/* Allocate the autocorellation buffer and initialise it to zero */
-	yin->yinBuffer = (double *) malloc(sizeof(double)* yin->halfBufferSize);
+	yin->yinBuffer = (float *) malloc(sizeof(float)* yin->halfBufferSize);
 
 
     if (yin->yinBuffer == 0){
@@ -195,9 +195,9 @@ void Yin_init(Yin *yin, int16_t bufferSize, float threshold){
  * @param  buffer Buffer of samples to analyse
  * @return        Fundamental frequency of the signal in Hz. Returns -1 if pitch can't be found
  */
-double Yin_getPitch(Yin *yin, double* buffer){
+float Yin_getPitch(Yin *yin, float* buffer){
 	int16_t tauEstimate = -1;
-	double pitchInHertz = -1;
+	float pitchInHertz = -1;
 	
 	/* Step 1: Calculates the squared difference of the signal with a shifted version of itself. */
 	Yin_difference(yin, buffer);
