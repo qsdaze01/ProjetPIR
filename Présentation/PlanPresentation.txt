@@ -31,6 +31,13 @@ I2S :
 - composé aussi d'un sélecteur 'word' qui indique au matériel si les données sont envoyées pour le canal 1 ou le canal 2. 
 - composé d'une ligne de données
 
+ESP32-WROVER :
+- micro-controlleur contenant un DSP (plutôt utile dans le domaîne de l'Audio Processing), il est aussi utilisé sur les Arduino avec le ESP32 Arduino Core
+- 32 Mbit SPI flash et 32 Mbit SRAM
+- CPU double coeur
+
+
+
 Optimisation en temps :
 Nécessité de faire du traitement rapidement, on est dans le cadre de la musique. Exemple : https://www.youtube.com/watch?v=oEfFbuT3I6A à partir de 20 secondes. Pour les amateurs de musique, il met de triolets de double croche (sextolets) dans un seul temps avec un tempo de 120 à la noire. Cela correspond à un temps de 8 centièmes de seconde environ. A cette vitesse, si le temps de traitement est trop long on peut sauter une note. Il faut donc prendre en compte la lecture des échantillons, le filtre passe-bas, le traitement par l'algo et l'écriture sur la carte SD. mettre des calculs
 
@@ -73,3 +80,28 @@ Intro :
 		- Sortie jack 
 		- Micros
 		- Audio Codec Chip (ES8388)
+
+Plan : 
+	
+	Intro commune
+
+	Groupe Pitch tracking :
+		
+		Pakinam :
+		- Motivation au projet
+		- Explication pitch tracking
+		- Algo de Yin
+
+		Gaspard :
+		- Utilisation des périphériques		
+		- Initialisation du matériel (code)
+
+		Luc : 
+		- Présentation du code 
+		- Gestion mémoire 
+		- Gestion du temps
+		- Filtrage 
+
+	Autres groupes
+
+	Conclusion commune
