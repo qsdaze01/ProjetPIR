@@ -10,12 +10,13 @@ Carte SD :
 - On active le pin 7 pour pouvoir utiliser l'entrée jack
 
 Micro :
+- Entrée auxilliaire 1
 - Gestion du gain
 - Gestion du seuil (en vrai non on l'a pas fait)
 - Gestion des différents micro -> test en mono -> on a gardé le stéréo
 
 Entrée jack : 
--
+- Entrée auxilliaire 2
 
 Audio Codec Chip (ES8388) :
 - composé de 2 canaux ADC, de 2 canaux DAC, d'un amplificateur de micro et d'un amplificateur de casque audio 
@@ -31,7 +32,7 @@ I2S :
 - composé d'une ligne de données
 
 Optimisation en temps :
-- Nécessité de faire du traitement rapidement, on est dans le cadre de la musique. Exemple : https://www.youtube.com/watch?v=oEfFbuT3I6A à partir de 20 secondes. Pour les amateurs de musique, il met de triolets de double croche (sextolets) dans un seul temps avec un tempo de 120 à la noire. Cela correspond à un temps de 8 centièmes de seconde environ. A cette vitesse, si le temps de traitement est trop long on peut sauter une note. Il faut donc prendre en compte la lecture des échantillons, le filtre passe-bas, le traitement par l'algo et l'écriture sur la carte SD. mettre des calculs
+Nécessité de faire du traitement rapidement, on est dans le cadre de la musique. Exemple : https://www.youtube.com/watch?v=oEfFbuT3I6A à partir de 20 secondes. Pour les amateurs de musique, il met de triolets de double croche (sextolets) dans un seul temps avec un tempo de 120 à la noire. Cela correspond à un temps de 8 centièmes de seconde environ. A cette vitesse, si le temps de traitement est trop long on peut sauter une note. Il faut donc prendre en compte la lecture des échantillons, le filtre passe-bas, le traitement par l'algo et l'écriture sur la carte SD. mettre des calculs
 
 Optimisation en mémoire :
 32Mb de mémoire flash (pour les programmes) et 32Mb de PSRAM c'est à dire de données stockables. La lecture de nos données se fait par des entiers signés sur 16 bits. On voir assez rapidement la limite si la mémoire n'est pas correctement gérée. C'est pour cela que les échantillons ne sont stockés que le temps des traitements et l'espace mémoire est libéré ensuite. Mettre des chiffres et des graphes
@@ -46,3 +47,29 @@ Nécessité de filtrage du son :
 Les micros de la LyraT sont très sensibles au bruit. Nous avons donc fait un passe-bas de ayant une bande passante allant jusqu'à 8500 Hz et une fréquence de coupure à 11 000 Hz. Il est d'ordre 48.
 
 Description de la LyraT et des problèmes rencontrés : Entrée micro 
+
+
+Intro : 
+	
+	Objectifs du PIR :
+	- Audio Processing sur de l'embarqué
+	- 3 projets à vous présenter
+	- Groupes :	
+		- Luc, Pakinam, Gaspard : Pitch tracking 
+		- Xinqing, Ziu :
+		- Weiyi :
+	- Volonté de travailler pour le cours Embaudio de 5A
+
+	Contraintes de nos projets : 
+	- Développer pour LyraT
+	- Utiliser IDF
+
+
+	Présentation de la carte LyraT :
+	- Carte d'espressif
+	- Composé d'un ESP32 
+	- De nombreux composants utiles pour le traitement et la génération de son
+		- Entrée jack
+		- Sortie jack 
+		- Micros
+		- Audio Codec Chip (ES8388)
