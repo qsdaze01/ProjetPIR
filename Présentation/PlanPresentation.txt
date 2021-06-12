@@ -56,6 +56,10 @@ Utilisation du code de Ashok Fernandez disponible du GitHub, il s'agit d'une tra
 Nécessité de filtrage du son :
 Les micros de la LyraT sont très sensibles au bruit. Nous avons donc fait un passe-bas de ayant une bande passante allant jusqu'à 8500 Hz et une fréquence de coupure à 11 000 Hz. Il est d'ordre 48.
 
+Ouverture et améliorations :
+Permettre une gestion temps réelle du gain
+Utilisation d'un filtre analogique plutôt que numérique pour le filtrage (gain de temps / gain de mémoire)
+
 Description de la LyraT et des problèmes rencontrés : Entrée micro 
 
 
