@@ -6,10 +6,29 @@ Parties : Utilisation du port de carte SD / utilisation du micro / optimisation 
 
 Utilisation des périphériques : 
 Carte SD : 
+- On utilise le 1-wire mode
+- On active le pin 7 pour pouvoir utiliser l'entrée jack
+
 Micro :
 - Gestion du gain
-- Gestion du seuil
+- Gestion du seuil (en vrai non on l'a pas fait)
 - Gestion des différents micro -> test en mono -> on a gardé le stéréo
+
+Entrée jack : 
+-
+
+Audio Codec Chip (ES8388) :
+- composé de 2 canaux ADC, de 2 canaux DAC, d'un amplificateur de micro et d'un amplificateur de casque audio 
+- on n'utilise le DAC que comme test pour vérifier ce qu'on entend
+- l'ADC nous sert à capter les données des micros ou de l'entrée jack
+- la fréquence d'échantillonnage est paramétrée à 48 000 Hz
+- 
+
+I2S : 
+- standard de serial bus pour connecter du matériel audio numérique
+- composé d'une horloge 'bit' qui donne une impulsion pour chaque bit de donnée sur la ligne de données. Pour nous sa fréquence est de 48 000*2*nombre de bits par canaux. 48 000 pour la fréquence d'échantillonnage et 2 pour le nombre de canaux stéréos
+- composé aussi d'un sélecteur 'word' qui indique au matériel si les données sont envoyées pour le canal 1 ou le canal 2. 
+- composé d'une ligne de données
 
 Optimisation en temps :
 - Nécessité de faire du traitement rapidement, on est dans le cadre de la musique. Exemple : https://www.youtube.com/watch?v=oEfFbuT3I6A à partir de 20 secondes. Pour les amateurs de musique, il met de triolets de double croche (sextolets) dans un seul temps avec un tempo de 120 à la noire. Cela correspond à un temps de 8 centièmes de seconde environ. A cette vitesse, si le temps de traitement est trop long on peut sauter une note. Il faut donc prendre en compte la lecture des échantillons, le filtre passe-bas, le traitement par l'algo et l'écriture sur la carte SD. mettre des calculs
@@ -17,11 +36,13 @@ Optimisation en temps :
 Optimisation en mémoire :
 32Mb de mémoire flash (pour les programmes) et 32Mb de PSRAM c'est à dire de données stockables. La lecture de nos données se fait par des entiers signés sur 16 bits. On voir assez rapidement la limite si la mémoire n'est pas correctement gérée. C'est pour cela que les échantillons ne sont stockés que le temps des traitements et l'espace mémoire est libéré ensuite. Mettre des chiffres et des graphes
 
+Conversion des fichiers C++ en C :
+Nous voulions tout coder en C. Or Romain Michon avait déjà fait une implémentation d'utilisation des micros en C++. Nous avons donc dû convertir les classes. Cela a aussi une utilité pour le cours embaudio puisque celui-ci se fait en C.
 
 Implémentation de l'algorithme de Yin : 
 Utilisation du code de Ashok Fernandez disponible du GitHub, il s'agit d'une traduction en C d'une implémentation en C++ par JorenSix dans le cadre du Pidato Experiment. Nous avons essentiellement réutilisé ce code avec des modifications mineures notamment pour la mémoire.
 
 Nécessité de filtrage du son :
-
+Les micros de la LyraT sont très sensibles au bruit. Nous avons donc fait un passe-bas de ayant une bande passante allant jusqu'à 8500 Hz et une fréquence de coupure à 11 000 Hz. Il est d'ordre 48.
 
 Description de la LyraT et des problèmes rencontrés : Entrée micro 
