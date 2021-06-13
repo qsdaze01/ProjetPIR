@@ -13,8 +13,8 @@ void app_main(){
 
 	Adt.fSampleRate = 48000;
 	Adt.fBufferSize = 266;
-	Adt.fNumInputs = 2;
-	Adt.fNumOutputs = 2;
+	Adt.fNumInputs = 1;
+	Adt.fNumOutputs = 1;
 	Adt.fHandle = NULL;
 	Adt.fRunning = false;
 

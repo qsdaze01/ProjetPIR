@@ -227,9 +227,9 @@ void stop(AudioDspType Adt)
 }
 
 
-double meanFrequency(double* values, int number_mean){
+float meanFrequency(float* values, int number_mean){
   int meaner = 0;
-  double sum = 0;
+  float sum = 0;
   for (int i=0 ; i<number_mean;i++){
     if (values[i]>-1 && values[i]<20000){
       sum += values[i];
@@ -244,24 +244,6 @@ double meanFrequency(double* values, int number_mean){
   }
 }
 
-void convolve (double *p_coeffs, int p_coeffs_n, double *p_in, double *p_out, int n){
-  int i, j, k;
-  double tmp;
-
-  for (k = 0; k < n; k++){  // position in output
-    tmp = 0;
-
-    for (i = 0; i < p_coeffs_n; i++){  // position in coefficients array
-      j = k - i;  // position in input
-
-      if (j >= 0){  // bounds check for input buffer
-        tmp += p_coeffs [k] * p_in [j];
-      }
-    }
-
-    p_out [i] = tmp;
-  }
-}
 
 float* convolve2(float h[], float x[], int lenH, int lenX, int* lenY)
 {
@@ -296,61 +278,71 @@ void audioTask(void * Adt)
   int number_mean = 5;
   float temp_pitch = 0.0;
   float mean_pitch = 0.0;
+  int nbSamples = 2500;
 
   /*      Buffers initialization      */
   
  // float bufferRes[1000]; //Mettre une autre taille, c'est pas la bonne
-  int16_t samples_data_in[2500]; //samples to be read by the microphones
-  float bufferEntree[2500]; // samples casted in float
+  int16_t samples_data_in[nbSamples]; //samples to be read by the microphones
+  float bufferEntree[nbSamples]; // samples casted in float
   float bufferOut[number_mean];
-  //float bufferFiltre[1500];
+  //float bufferFiltre[nbSamples];
   int lenReturn;
   //float temp[2660];
 
   /*    Pitch Tracking using the samples coming from the microphones   */
 
   FILE *dat=fopen(MOUNT_POINT"/son.dat", "w");
-  while (count<10) { // arbitrary condition, could very well be a "while (true)"
+  while (count<1000) { // arbitrary condition, could very well be a "while (true)"
     size_t bytes_read = 0;
-    i2s_read((i2s_port_t)0, &samples_data_in, 2500*sizeof(int16_t), &bytes_read, portMAX_DELAY); // Reads the samples from the mic, see doc for parameters
+    i2s_read((i2s_port_t)0, &samples_data_in, nbSamples*sizeof(int16_t), &bytes_read, portMAX_DELAY); // Reads the samples from the mic, see doc for parameters
 
-    for(int i = 0; i < 2500; i++){
+    for(int i = 0; i < nbSamples; i++){
       bufferEntree[i] = (float) (samples_data_in[i]); // casting samples to float
       //printf("%f\n",bufferEntree[i]);
     }
 
-    float *bufferFiltre = convolve2(coef, bufferEntree, nbCoef, 2500, &lenReturn);
+    float *bufferFiltre = convolve2(coef, bufferEntree, nbCoef, nbSamples, &lenReturn);
   
     
-    for(int j=0; j<2500 ; j++){
+    for(int j=0; j<nbSamples ; j++){
       fprintf(dat, "%d \n", (int) (bufferFiltre[j]));
       //fprintf(dat, "%d\n", (int) (bufferEntree[j]));
     }
 
-    int buffer_length = 500; //arbitrary length
+    int buffer_length = nbSamples; //arbitrary length
 
-    while ((temp_pitch<10 || temp_pitch>15000) && buffer_length<2500){ // loop to avoid aberrant pitch values and limit calculation duration
-      Yin_init(&yin, buffer_length, 0.5); // init of yin object with buffer length and threshold parameters
+    /*while ((temp_pitch<10 || temp_pitch>nbSamples0) && buffer_length<nbSamples){ // loop to avoid aberrant pitch values and limit calculation duration
+      Yin_init(&yin, buffer_length, 0.2); // init of yin object with buffer length and threshold parameters
       temp_pitch = Yin_getPitch(&yin,bufferFiltre);
       //temp_pitch = Yin_getPitch(&yin,bufferEntree);
-      buffer_length += 500;
+      buffer_length += nbSamples;
       free(yin.yinBuffer); // very important to avoid memory problems
-    }
+    }*/
+
+    Yin_init(&yin, buffer_length, 0.2); // init of yin object with buffer length and threshold parameters
+    temp_pitch = Yin_getPitch(&yin,bufferFiltre);
+    //temp_pitch = Yin_getPitch(&yin,bufferEntree);
+    //buffer_length += nbSamples;
+    free(yin.yinBuffer); // very important to avoid memory problems
+
     bufferOut[count%number_mean] = temp_pitch;
     printf("Fondamentale : %f\n", temp_pitch );
     temp_pitch = 0.0;
     printf("Tour numéro %d\n", count );
     
-    i2s_write((i2s_port_t)0, &samples_data_in, 2500*sizeof(int16_t), &bytes_read, portMAX_DELAY);
+    //i2s_write((i2s_port_t)0, &samples_data_in, nbSamples*sizeof(int16_t), &bytes_read, portMAX_DELAY);
 
-    /*
+    
     if (count%number_mean == (number_mean-1)){
       mean_pitch = meanFrequency(bufferOut, number_mean);
-      fprintf(dat, "%d \n", (int) (mean_pitch/2));
+      //fprintf(dat, "%d \n", (int) (mean_pitch));
+      //printf("Valeur moyenne : %f\n", mean_pitch);
       mean_pitch=0;
-    }*/
+    }
 
-    //free(bufferFiltre);
+    free(bufferFiltre);
+
     count++; 
   }
 
