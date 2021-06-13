@@ -1,7 +1,7 @@
 $<TARGET_FILE:__idf_mbedtls>
 $<TARGET_FILE:__idf_efuse>
-$<TARGET_FILE:__idf_bootloader_support>
 $<TARGET_FILE:__idf_app_update>
+$<TARGET_FILE:__idf_bootloader_support>
 $<TARGET_FILE:__idf_esp_ipc>
 $<TARGET_FILE:__idf_spi_flash>
 $<TARGET_FILE:__idf_nvs_flash>

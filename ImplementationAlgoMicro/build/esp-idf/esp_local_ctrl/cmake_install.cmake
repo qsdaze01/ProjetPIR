@@ -1,4 +1,4 @@
-# Install script for directory: /home/gaspard/esp/esp-idf/components/esp_local_ctrl
+# Install script for directory: /home/luc/esp/esp-idf/components/esp_local_ctrl
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

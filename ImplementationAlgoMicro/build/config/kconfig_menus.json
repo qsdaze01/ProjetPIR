@@ -85,10 +85,10 @@
                 "children": [],
                 "depends_on": "<choice IDF_TARGET_ESP32S3_BETA_VERSION>",
                 "help": null,
-                "id": "IDF_TARGET_ESP32S3_BETA_VERSION_2",
-                "name": "IDF_TARGET_ESP32S3_BETA_VERSION_2",
+                "id": "IDF_TARGET_ESP32S3_BETA_VERSION_3",
+                "name": "IDF_TARGET_ESP32S3_BETA_VERSION_3",
                 "range": null,
-                "title": "ESP32-S3 beta2",
+                "title": "ESP32-S3 beta3",
                 "type": "bool"
             }
         ],
@@ -800,7 +800,7 @@
                     },
                     {
                         "children": [],
-                        "depends_on": "SECURE_BOOT_SUPPORTS_RSA && SECURE_BOOT_V2_ENABLED && <choice SECURE_SIGNED_APPS_SCHEME>",
+                        "depends_on": "SECURE_BOOT_SUPPORTS_RSA && (SECURE_SIGNED_APPS_NO_SECURE_BOOT || SECURE_BOOT_V2_ENABLED) && <choice SECURE_SIGNED_APPS_SCHEME>",
                         "help": "Appends the RSA-3072 based Signature block to the application.\nRefer to <Secure Boot Version 2 documentation link> before enabling.",
                         "id": "SECURE_SIGNED_APPS_RSA_SCHEME",
                         "name": "SECURE_SIGNED_APPS_RSA_SCHEME",
@@ -810,7 +810,7 @@
                     }
                 ],
                 "depends_on": "SECURE_BOOT || SECURE_SIGNED_APPS_NO_SECURE_BOOT",
-                "help": "Select the Secure App signing scheme. Depends on the Chip Revision.\nThere are two options:\n1. ECDSA based secure boot scheme. (Only choice for Secure Boot V1)\nSupported in ESP32 and ESP32-ECO3.\n2. The RSA based secure boot scheme. (Only choice for Secure Boot V2)\nSupported in ESP32-ECO3. (ESP32 Chip Revision 3 onwards)",
+                "help": "Select the Secure App signing scheme. Depends on the Chip Revision.\nThere are two options:\n1. ECDSA based secure boot scheme. (Only choice for Secure Boot V1)\nSupported in ESP32 and ESP32-ECO3.\n2. The RSA based secure boot scheme. (Only choice for Secure Boot V2)\nSupported in ESP32-ECO3 (ESP32 Chip Revision 3 onwards), ESP32-S2, ESP32-C3, ESP32-S3.",
                 "id": "security-features-app-signing-scheme",
                 "name": "SECURE_SIGNED_APPS_SCHEME",
                 "title": "App Signing Scheme",
@@ -818,7 +818,7 @@
             },
             {
                 "children": [],
-                "depends_on": "SECURE_SIGNED_APPS_NO_SECURE_BOOT",
+                "depends_on": "SECURE_SIGNED_APPS_NO_SECURE_BOOT && SECURE_SIGNED_APPS_ECDSA_SCHEME",
                 "help": "If this option is set, the bootloader will be compiled with code to verify that an app is signed before\nbooting it.\n\nIf hardware secure boot is enabled, this option is always enabled and cannot be disabled.\nIf hardware secure boot is not enabled, this option doesn't add significant security by itself so most\nusers will want to leave it disabled.",
                 "id": "SECURE_SIGNED_ON_BOOT_NO_SECURE_BOOT",
                 "name": "SECURE_SIGNED_ON_BOOT_NO_SECURE_BOOT",
@@ -1103,16 +1103,6 @@
                     },
                     {
                         "children": [],
-                        "depends_on": "SECURE_BOOT_INSECURE && SECURE_BOOT_V2_ENABLED",
-                        "help": "By default, enabling either flash encryption in release mode or secure boot will automatically\ndisable UART download mode on ESP32 ECO3, or enable secure download mode on newer chips.\nThis is recommended to reduce the attack surface of the chip.\n\nTo allow the full UART download mode to stay enabled, enable this option and ensure\nthe options SECURE_DISABLE_ROM_DL_MODE and SECURE_ENABLE_SECURE_ROM_DL_MODE are disabled as applicable.\nThis is not recommended.",
-                        "id": "SECURE_INSECURE_ALLOW_DL_MODE",
-                        "name": "SECURE_INSECURE_ALLOW_DL_MODE",
-                        "range": null,
-                        "title": "Don't automatically restrict UART download mode",
-                        "type": "bool"
-                    },
-                    {
-                        "children": [],
                         "depends_on": "SECURE_FLASH_ENCRYPTION_MODE_DEVELOPMENT",
                         "help": "If not set (default), the bootloader will permanently disable UART bootloader encryption access on\nfirst boot. If set, the UART bootloader will still be able to access hardware encryption.\n\nIt is recommended to only set this option in testing environments.",
                         "id": "SECURE_FLASH_UART_BOOTLOADER_ALLOW_ENC",
@@ -1159,26 +1149,6 @@
             },
             {
                 "children": [],
-                "depends_on": "!IDF_TARGET_ESP32 || ESP32_REV_MIN_3",
-                "help": "If set, during startup the app will burn an eFuse bit to permanently disable the UART ROM\nDownload Mode. This prevents any future use of esptool.py, espefuse.py and similar tools.\n\nOnce disabled, if the SoC is booted with strapping pins set for ROM Download Mode\nthen an error is printed instead.\n\nIt is recommended to enable this option in any production application where Flash\nEncryption and/or Secure Boot is enabled and access to Download Mode is not required.\n\nIt is also possible to permanently disable Download Mode by calling\nesp_efuse_disable_rom_download_mode() at runtime.",
-                "id": "SECURE_DISABLE_ROM_DL_MODE",
-                "name": "SECURE_DISABLE_ROM_DL_MODE",
-                "range": null,
-                "title": "Permanently disable ROM Download Mode",
-                "type": "bool"
-            },
-            {
-                "children": [],
-                "depends_on": "SECURE_TARGET_HAS_SECURE_ROM_DL_MODE && !SECURE_DISABLE_ROM_DL_MODE",
-                "help": "If set, during startup the app will burn an eFuse bit to permanently switch the UART ROM\nDownload Mode into a separate Secure Download mode. This option can only work if\nDownload Mode is not already disabled by eFuse.\n\nSecure Download mode limits the use of Download Mode functions to simple flash read,\nwrite and erase operations, plus a command to return a summary of currently enabled\nsecurity features.\n\nSecure Download mode is not compatible with the esptool.py flasher stub feature,\nespefuse.py, read/writing memory or registers, encrypted download, or any other\nfeatures that interact with unsupported Download Mode commands.\n\nSecure Download mode should be enabled in any application where Flash Encryption\nand/or Secure Boot is enabled. Disabling this option does not immediately cancel\nthe benefits of the security features, but it increases the potential \"attack\nsurface\" for an attacker to try and bypass them with a successful physical attack.\n\nIt is also possible to enable secure download mode at runtime by calling\nesp_efuse_enable_rom_secure_download_mode()",
-                "id": "SECURE_ENABLE_SECURE_ROM_DL_MODE",
-                "name": "SECURE_ENABLE_SECURE_ROM_DL_MODE",
-                "range": null,
-                "title": "Permanently switch to ROM UART Secure Download mode",
-                "type": "bool"
-            },
-            {
-                "children": [],
                 "depends_on": "SECURE_FLASH_ENC_ENABLED",
                 "help": "If set (default), in an app during startup code,\nthere is a check of the flash encryption eFuse bit is on\n(as the bootloader should already have set it).\nThe app requires this bit is on to continue work otherwise abort.\n\nIf not set, the app does not care if the flash encryption eFuse bit is set or not.",
                 "id": "SECURE_FLASH_CHECK_ENC_EN_IN_APP",
@@ -1186,6 +1156,46 @@
                 "range": null,
                 "title": "Check Flash Encryption enabled on app startup",
                 "type": "bool"
+            },
+            {
+                "children": [
+                    {
+                        "children": [],
+                        "depends_on": "<choice SECURE_UART_ROM_DL_MODE>",
+                        "help": "If set, during startup the app will burn an eFuse bit to permanently disable the UART ROM\nDownload Mode. This prevents any future use of esptool.py, espefuse.py and similar tools.\n\nOnce disabled, if the SoC is booted with strapping pins set for ROM Download Mode\nthen an error is printed instead.\n\nIt is recommended to enable this option in any production application where Flash\nEncryption and/or Secure Boot is enabled and access to Download Mode is not required.\n\nIt is also possible to permanently disable Download Mode by calling\nesp_efuse_disable_rom_download_mode() at runtime.",
+                        "id": "SECURE_DISABLE_ROM_DL_MODE",
+                        "name": "SECURE_DISABLE_ROM_DL_MODE",
+                        "range": null,
+                        "title": "UART ROM download mode (Permanently disabled (recommended))",
+                        "type": "bool"
+                    },
+                    {
+                        "children": [],
+                        "depends_on": "SECURE_TARGET_HAS_SECURE_ROM_DL_MODE && <choice SECURE_UART_ROM_DL_MODE>",
+                        "help": "If set, during startup the app will burn an eFuse bit to permanently switch the UART ROM\nDownload Mode into a separate Secure Download mode. This option can only work if\nDownload Mode is not already disabled by eFuse.\n\nSecure Download mode limits the use of Download Mode functions to simple flash read,\nwrite and erase operations, plus a command to return a summary of currently enabled\nsecurity features.\n\nSecure Download mode is not compatible with the esptool.py flasher stub feature,\nespefuse.py, read/writing memory or registers, encrypted download, or any other\nfeatures that interact with unsupported Download Mode commands.\n\nSecure Download mode should be enabled in any application where Flash Encryption\nand/or Secure Boot is enabled. Disabling this option does not immediately cancel\nthe benefits of the security features, but it increases the potential \"attack\nsurface\" for an attacker to try and bypass them with a successful physical attack.\n\nIt is also possible to enable secure download mode at runtime by calling\nesp_efuse_enable_rom_secure_download_mode()",
+                        "id": "SECURE_ENABLE_SECURE_ROM_DL_MODE",
+                        "name": "SECURE_ENABLE_SECURE_ROM_DL_MODE",
+                        "range": null,
+                        "title": "UART ROM download mode (Permanently switch to Secure mode (recommended))",
+                        "type": "bool"
+                    },
+                    {
+                        "children": [],
+                        "depends_on": "<choice SECURE_UART_ROM_DL_MODE>",
+                        "help": "This is a potentially insecure option.\nEnabling this option will allow the full UART download mode to stay enabled.\nThis option SHOULD NOT BE ENABLED for production use cases.",
+                        "id": "SECURE_INSECURE_ALLOW_DL_MODE",
+                        "name": "SECURE_INSECURE_ALLOW_DL_MODE",
+                        "range": null,
+                        "title": "UART ROM download mode (Enabled (not recommended))",
+                        "type": "bool"
+                    }
+                ],
+                "depends_on": "(SECURE_BOOT_V2_ENABLED || SECURE_FLASH_ENC_ENABLED) && (!IDF_TARGET_ESP32 || ESP32_REV_MIN_3)",
+                "help": null,
+                "id": "security-features-uart-rom-download-mode",
+                "name": "SECURE_UART_ROM_DL_MODE",
+                "title": "UART ROM download mode",
+                "type": "choice"
             }
         ],
         "depends_on": null,
@@ -1986,6 +1996,16 @@
                 "name": "COMPILER_OPTIMIZATION_ASSERTION_LEVEL",
                 "title": "Assertion level",
                 "type": "choice"
+            },
+            {
+                "children": [],
+                "depends_on": null,
+                "help": "If enabled, the error messages will be discarded in following check macros:\n- ESP_RETURN_ON_ERROR\n- ESP_EXIT_ON_ERROR\n- ESP_RETURN_ON_FALSE\n- ESP_EXIT_ON_FALSE",
+                "id": "COMPILER_OPTIMIZATION_CHECKS_SILENT",
+                "name": "COMPILER_OPTIMIZATION_CHECKS_SILENT",
+                "range": null,
+                "title": "Disable messages in ESP_RETURN_ON_* and ESP_EXIT_ON_* macros",
+                "type": "bool"
             },
             {
                 "children": [],
@@ -3234,7 +3254,7 @@
                             {
                                 "children": [],
                                 "depends_on": null,
-                                "help": "BLE maximum instances of bluetooth controller.",
+                                "help": "BLE maximum activities of bluetooth controller\uff0cboth of connections,\nscan , sync and adv(periodic adv, multi-adv).",
                                 "id": "BT_CTRL_BLE_MAX_ACT",
                                 "name": "BT_CTRL_BLE_MAX_ACT",
                                 "range": [
@@ -3486,6 +3506,56 @@
                                         "children": [],
                                         "depends_on": "<choice BT_CTRL_DFT_TX_POWER_LEVEL>",
                                         "help": null,
+                                        "id": "BT_CTRL_DFT_TX_POWER_LEVEL_N27",
+                                        "name": "BT_CTRL_DFT_TX_POWER_LEVEL_N27",
+                                        "range": null,
+                                        "title": "-27dBm",
+                                        "type": "bool"
+                                    },
+                                    {
+                                        "children": [],
+                                        "depends_on": "<choice BT_CTRL_DFT_TX_POWER_LEVEL>",
+                                        "help": null,
+                                        "id": "BT_CTRL_DFT_TX_POWER_LEVEL_N24",
+                                        "name": "BT_CTRL_DFT_TX_POWER_LEVEL_N24",
+                                        "range": null,
+                                        "title": "-24dBm",
+                                        "type": "bool"
+                                    },
+                                    {
+                                        "children": [],
+                                        "depends_on": "<choice BT_CTRL_DFT_TX_POWER_LEVEL>",
+                                        "help": null,
+                                        "id": "BT_CTRL_DFT_TX_POWER_LEVEL_N21",
+                                        "name": "BT_CTRL_DFT_TX_POWER_LEVEL_N21",
+                                        "range": null,
+                                        "title": "-21dBm",
+                                        "type": "bool"
+                                    },
+                                    {
+                                        "children": [],
+                                        "depends_on": "<choice BT_CTRL_DFT_TX_POWER_LEVEL>",
+                                        "help": null,
+                                        "id": "BT_CTRL_DFT_TX_POWER_LEVEL_N18",
+                                        "name": "BT_CTRL_DFT_TX_POWER_LEVEL_N18",
+                                        "range": null,
+                                        "title": "-18dBm",
+                                        "type": "bool"
+                                    },
+                                    {
+                                        "children": [],
+                                        "depends_on": "<choice BT_CTRL_DFT_TX_POWER_LEVEL>",
+                                        "help": null,
+                                        "id": "BT_CTRL_DFT_TX_POWER_LEVEL_N15",
+                                        "name": "BT_CTRL_DFT_TX_POWER_LEVEL_N15",
+                                        "range": null,
+                                        "title": "-15dBm",
+                                        "type": "bool"
+                                    },
+                                    {
+                                        "children": [],
+                                        "depends_on": "<choice BT_CTRL_DFT_TX_POWER_LEVEL>",
+                                        "help": null,
                                         "id": "BT_CTRL_DFT_TX_POWER_LEVEL_N12",
                                         "name": "BT_CTRL_DFT_TX_POWER_LEVEL_N12",
                                         "range": null,
@@ -3560,6 +3630,36 @@
                                         "name": "BT_CTRL_DFT_TX_POWER_LEVEL_P9",
                                         "range": null,
                                         "title": "+9dBm",
+                                        "type": "bool"
+                                    },
+                                    {
+                                        "children": [],
+                                        "depends_on": "<choice BT_CTRL_DFT_TX_POWER_LEVEL>",
+                                        "help": null,
+                                        "id": "BT_CTRL_DFT_TX_POWER_LEVEL_P12",
+                                        "name": "BT_CTRL_DFT_TX_POWER_LEVEL_P12",
+                                        "range": null,
+                                        "title": "+12dBm",
+                                        "type": "bool"
+                                    },
+                                    {
+                                        "children": [],
+                                        "depends_on": "<choice BT_CTRL_DFT_TX_POWER_LEVEL>",
+                                        "help": null,
+                                        "id": "BT_CTRL_DFT_TX_POWER_LEVEL_P15",
+                                        "name": "BT_CTRL_DFT_TX_POWER_LEVEL_P15",
+                                        "range": null,
+                                        "title": "+15dBm",
+                                        "type": "bool"
+                                    },
+                                    {
+                                        "children": [],
+                                        "depends_on": "<choice BT_CTRL_DFT_TX_POWER_LEVEL>",
+                                        "help": null,
+                                        "id": "BT_CTRL_DFT_TX_POWER_LEVEL_P18",
+                                        "name": "BT_CTRL_DFT_TX_POWER_LEVEL_P18",
+                                        "range": null,
+                                        "title": "+18dBm",
                                         "type": "bool"
                                     }
                                 ],
@@ -3783,11 +3883,11 @@
                                                             {
                                                                 "children": [],
                                                                 "depends_on": "ESP32C3_RTC_CLK_SRC_INT_RC && <choice BT_CTRL_LOW_POWER_CLOCK>",
-                                                                "help": "Internal 90kHz RC oscillator.",
+                                                                "help": "Internal 150kHz RC oscillator.",
                                                                 "id": "BT_CTRL_LPCLK_SEL_RTC_SLOW",
                                                                 "name": "BT_CTRL_LPCLK_SEL_RTC_SLOW",
                                                                 "range": null,
-                                                                "title": "Internal 90kHz RC oscillator",
+                                                                "title": "Internal 150kHz RC oscillator",
                                                                 "type": "bool"
                                                             }
                                                         ],
@@ -6703,8 +6803,8 @@
                             },
                             {
                                 "children": [],
-                                "depends_on": "BT_BLUEDROID_ENABLED && (IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32S3)",
-                                "help": "This enables controller RPA list function.",
+                                "depends_on": "BT_BLUEDROID_ENABLED",
+                                "help": "This enables controller RPA list function.\nFor ESP32, ESP32 only support network privacy mode. If this option is enabled, ESP32 will only accept\nadvertising packets from peer devices that contain private address, HW will not receive the advertising\npackets contain identity address after IRK changed. If this option is disabled, address resolution will\nbe performed in the host, so the functions that require controller to resolve address in the white list\ncannot be used. This option is disabled by default on ESP32, please enable or disable this option according\nto your own needs.\n\nFor ESP32C3 and esp32s3, devices support network privacy mode and device privacy mode, users can switch the\ntwo modes according to their own needs. So this option is enabled by default.",
                                 "id": "BT_BLE_RPA_SUPPORTED",
                                 "name": "BT_BLE_RPA_SUPPORTED",
                                 "range": null,
@@ -9120,6 +9220,46 @@
                                 "range": null,
                                 "title": "Place TWAI ISR function into IRAM",
                                 "type": "bool"
+                            },
+                            {
+                                "children": [],
+                                "depends_on": "IDF_TARGET_ESP32",
+                                "help": "When the bus-off condition is reached, the REC should be reset to 0 and frozen (via LOM) by the\ndriver's ISR. However on the ESP32, there is an edge case where the REC will increase before the\ndriver's ISR can respond in time (e.g., due to the rapid occurrence of bus errors), thus causing the\nREC to be non-zero after bus-off. A non-zero REC can prevent bus-off recovery as the bus-off recovery\ncondition is that both TEC and REC become 0. Enabling this option will add a workaround in the driver\nto forcibly reset REC to zero on reaching bus-off.",
+                                "id": "TWAI_ERRATA_FIX_BUS_OFF_REC",
+                                "name": "TWAI_ERRATA_FIX_BUS_OFF_REC",
+                                "range": null,
+                                "title": "Add SW workaround for REC change during bus-off",
+                                "type": "bool"
+                            },
+                            {
+                                "children": [],
+                                "depends_on": "IDF_TARGET_ESP32",
+                                "help": "On the ESP32, when a transmit interrupt occurs, and interrupt register is read on the same APB clock\ncycle, the transmit interrupt could be lost. Enabling this option will add a workaround that checks the\ntransmit buffer status bit to recover any lost transmit interrupt.",
+                                "id": "TWAI_ERRATA_FIX_TX_INTR_LOST",
+                                "name": "TWAI_ERRATA_FIX_TX_INTR_LOST",
+                                "range": null,
+                                "title": "Add SW workaround for TX interrupt lost errata",
+                                "type": "bool"
+                            },
+                            {
+                                "children": [],
+                                "depends_on": "IDF_TARGET_ESP32",
+                                "help": "On the ESP32, when receiving a data or remote frame, if a bus error occurs in the data or CRC field,\nthe data of the next received frame could be invalid. Enabling this option will add a workaround that\nwill reset the peripheral on detection of this errata condition. Note that if a frame is transmitted on\nthe bus whilst the reset is ongoing, the message will not be receive by the peripheral sent on the bus\nduring the reset, the message will be lost.",
+                                "id": "TWAI_ERRATA_FIX_RX_FRAME_INVALID",
+                                "name": "TWAI_ERRATA_FIX_RX_FRAME_INVALID",
+                                "range": null,
+                                "title": "Add SW workaround for invalid RX frame errata",
+                                "type": "bool"
+                            },
+                            {
+                                "children": [],
+                                "depends_on": "IDF_TARGET_ESP32",
+                                "help": "On the ESP32, when the RX FIFO overruns and the RX message counter maxes out at 64 messages, the entire\nRX FIFO is no longer recoverable. Enabling this option will add a workaround that resets the peripheral\non detection of this errata condition. Note that if a frame is being sent on the bus during the reset\nbus during the reset, the message will be lost.",
+                                "id": "TWAI_ERRATA_FIX_RX_FIFO_CORRUPT",
+                                "name": "TWAI_ERRATA_FIX_RX_FIFO_CORRUPT",
+                                "range": null,
+                                "title": "Add SW workaround for RX FIFO corruption errata",
+                                "type": "bool"
                             }
                         ],
                         "depends_on": null,
@@ -10970,6 +11110,16 @@
                         "range": null,
                         "title": "Enable HTTP Basic Authentication",
                         "type": "bool"
+                    },
+                    {
+                        "children": [],
+                        "depends_on": null,
+                        "help": "This option will enable HTTP Digest Authentication. It is enabled by default, but use of this\nconfiguration is not recommended as the password can be derived from the exchange, so it introduces\na vulnerability when not using TLS",
+                        "id": "ESP_HTTP_CLIENT_ENABLE_DIGEST_AUTH",
+                        "name": "ESP_HTTP_CLIENT_ENABLE_DIGEST_AUTH",
+                        "range": null,
+                        "title": "Enable HTTP Digest Authentication",
+                        "type": "bool"
                     }
                 ],
                 "depends_on": null,
@@ -11114,16 +11264,6 @@
                                 "range": null,
                                 "title": null,
                                 "type": "bool"
-                            },
-                            {
-                                "children": [],
-                                "depends_on": null,
-                                "help": null,
-                                "id": "ESP_MAC_ADDR_UNIVERSE_BT_OFFSET",
-                                "name": "ESP_MAC_ADDR_UNIVERSE_BT_OFFSET",
-                                "range": null,
-                                "title": null,
-                                "type": "int"
                             },
                             {
                                 "children": [],
@@ -11412,7 +11552,7 @@
                     {
                         "children": [],
                         "depends_on": "!SPIRAM",
-                        "help": "If enabled, chip will try to power down flash at light sleep, which costs more time when chip wakes up.\nOnly can be enabled if there is no SPIRAM configured.",
+                        "help": "If enabled, chip will try to power down flash at light sleep, which costs more time when chip wakes up.\nCan only be enabled if there is no SPIRAM configured. This option will in fact consider VDD_SDIO auto power\nvalue (ESP_PD_OPTION_AUTO) as OFF. Also, it is possible to force a power domain to stay ON during light\nsleep by using esp_sleep_pd_config() function.",
                         "id": "ESP_SYSTEM_PD_FLASH",
                         "name": "ESP_SYSTEM_PD_FLASH",
                         "range": null,
@@ -11489,6 +11629,56 @@
                         "type": "int"
                     },
                     {
+                        "children": [
+                            {
+                                "children": [],
+                                "depends_on": "<choice ESP_MAIN_TASK_AFFINITY>",
+                                "help": null,
+                                "id": "ESP_MAIN_TASK_AFFINITY_CPU0",
+                                "name": "ESP_MAIN_TASK_AFFINITY_CPU0",
+                                "range": null,
+                                "title": "CPU0",
+                                "type": "bool"
+                            },
+                            {
+                                "children": [],
+                                "depends_on": "!FREERTOS_UNICORE && <choice ESP_MAIN_TASK_AFFINITY>",
+                                "help": null,
+                                "id": "ESP_MAIN_TASK_AFFINITY_CPU1",
+                                "name": "ESP_MAIN_TASK_AFFINITY_CPU1",
+                                "range": null,
+                                "title": "CPU1",
+                                "type": "bool"
+                            },
+                            {
+                                "children": [],
+                                "depends_on": "<choice ESP_MAIN_TASK_AFFINITY>",
+                                "help": null,
+                                "id": "ESP_MAIN_TASK_AFFINITY_NO_AFFINITY",
+                                "name": "ESP_MAIN_TASK_AFFINITY_NO_AFFINITY",
+                                "range": null,
+                                "title": "No affinity",
+                                "type": "bool"
+                            }
+                        ],
+                        "depends_on": null,
+                        "help": "Configure the \"main task\" core affinity. This is the used core of the task\nwhich calls app_main(). If app_main() returns then this task is deleted.",
+                        "id": "component-config-esp-system-settings-main-task-core-affinity",
+                        "name": "ESP_MAIN_TASK_AFFINITY",
+                        "title": "Main task core affinity",
+                        "type": "choice"
+                    },
+                    {
+                        "children": [],
+                        "depends_on": null,
+                        "help": null,
+                        "id": "ESP_MAIN_TASK_AFFINITY",
+                        "name": "ESP_MAIN_TASK_AFFINITY",
+                        "range": null,
+                        "title": null,
+                        "type": "hex"
+                    },
+                    {
                         "children": [],
                         "depends_on": null,
                         "help": "Minimal value of size, in bytes, accepted to execute a expression\nwith shared stack.",
@@ -11512,7 +11702,7 @@
                             },
                             {
                                 "children": [],
-                                "depends_on": "IDF_TARGET_ESP32S2 && !USB_ENABLED && <choice ESP_CONSOLE_UART>",
+                                "depends_on": "(IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3) && !USB_ENABLED && <choice ESP_CONSOLE_UART>",
                                 "help": null,
                                 "id": "ESP_CONSOLE_USB_CDC",
                                 "name": "ESP_CONSOLE_USB_CDC",
@@ -11910,7 +12100,7 @@
                             }
                         ],
                         "depends_on": null,
-                        "help": "esp_timer APIs can be implemented using different hardware timers.\n\n- \"FRC2 (legacy)\" implementation has been used in ESP-IDF v2.x - v4.1.\n\n- \"LAC timer of Timer Group 0\" implementation is simpler, and has smaller\n  run time overhead because software handling of timer overflow is not needed.\n\n- \"SYSTIMER\" implementation is similar to \"LAC timer of Timer Group 0\" but for ESP32-S2 chip.",
+                        "help": "esp_timer APIs can be implemented using different hardware timers.\n\n- \"FRC2 (legacy)\" implementation has been used in ESP-IDF v2.x - v4.1.\n\n- \"LAC timer of Timer Group 0\" implementation is simpler, and has smaller\n  run time overhead because software handling of timer overflow is not needed.\n\n- \"SYSTIMER\" implementation is similar to \"LAC timer of Timer Group 0\" but for non ESP32 chips.",
                         "id": "component-config-high-resolution-timer-esp_timer--hardware-timer-to-use-for-esp_timer",
                         "name": "ESP_TIMER_IMPL",
                         "title": "Hardware timer to use for esp_timer",
@@ -12482,6 +12672,16 @@
                     },
                     {
                         "children": [
+                            {
+                                "children": [],
+                                "depends_on": "ESP32_PHY_INIT_DATA_IN_PARTITION",
+                                "help": "If enabled, PHY init data will be restored to default if\nit cannot be verified successfully to avoid endless bootloops.\n\nIf unsure, choose 'n'.",
+                                "id": "ESP32_PHY_DEFAULT_INIT_IF_INVALID",
+                                "name": "ESP32_PHY_DEFAULT_INIT_IF_INVALID",
+                                "range": null,
+                                "title": "Reset default PHY init data if invalid",
+                                "type": "bool"
+                            },
                             {
                                 "children": [
                                     {
@@ -14242,6 +14442,16 @@
                     {
                         "children": [],
                         "depends_on": null,
+                        "help": "If this feature is enabled, standard POSIX APIs: if_indextoname(), if_nametoindex()\ncould be used to convert network interface index to name\ninstead of IDF specific esp-netif APIs (such as esp_netif_get_netif_impl_name())",
+                        "id": "LWIP_NETIF_API",
+                        "name": "LWIP_NETIF_API",
+                        "range": null,
+                        "title": "Enable usage of standard POSIX APIs in LWIP",
+                        "type": "bool"
+                    },
+                    {
+                        "children": [],
+                        "depends_on": null,
                         "help": "If this feature is enabled, standard API such as gethostbyname\nsupport .local addresses by sending one shot multicast mDNS\nquery",
                         "id": "LWIP_DNS_SUPPORT_MDNS_QUERIES",
                         "name": "LWIP_DNS_SUPPORT_MDNS_QUERIES",
@@ -15199,6 +15409,40 @@
                         "depends_on": null,
                         "id": "component-config-lwip-sntp",
                         "title": "SNTP",
+                        "type": "menu"
+                    },
+                    {
+                        "children": [
+                            {
+                                "children": [],
+                                "depends_on": null,
+                                "help": "Interval in seconds between keepalive LCP echo requests, 0 to disable.",
+                                "id": "LCP_ECHOINTERVAL",
+                                "name": "LCP_ECHOINTERVAL",
+                                "range": [
+                                    0,
+                                    1000000
+                                ],
+                                "title": "Echo interval (s)",
+                                "type": "int"
+                            },
+                            {
+                                "children": [],
+                                "depends_on": null,
+                                "help": "Number of consecutive unanswered echo requests before failure is indicated.",
+                                "id": "LCP_MAXECHOFAILS",
+                                "name": "LCP_MAXECHOFAILS",
+                                "range": [
+                                    0,
+                                    100000
+                                ],
+                                "title": "Maximum echo failures",
+                                "type": "int"
+                            }
+                        ],
+                        "depends_on": null,
+                        "id": "component-config-lwip-lcp",
+                        "title": "LCP",
                         "type": "menu"
                     },
                     {
@@ -17519,11 +17763,11 @@
                     {
                         "children": [],
                         "depends_on": "IDF_TARGET_ESP32C3 && !SPI_FLASH_USE_LEGACY_IMPL && !SPI_FLASH_ROM_IMPL",
-                        "help": "This option is default n before ESP32-C3, because it needs bootloader support.\n\nCAUTION: If you want to OTA to an app with this feature turned on, please make\nsure the bootloader has the support for it. (later than IDF v4.3)",
+                        "help": "This option is default n before ESP32-C3, because it needs bootloader support.\n\nCAUTION: If you want to OTA to an app with this feature turned on, please make\nsure the bootloader has the support for it. (later than IDF v4.3)\n\nAuto-suspend feature only supported by XMC chip.\nIf you are using an official module, please contact Espressif Business support.\nAlso reading auto suspend part in `SPI Flash API` document before you enable this function.",
                         "id": "SPI_FLASH_AUTO_SUSPEND",
                         "name": "SPI_FLASH_AUTO_SUSPEND",
                         "range": null,
-                        "title": "Auto suspend long erase/write operations",
+                        "title": "Auto suspend long erase/write operations (READ DOCS FIRST)",
                         "type": "bool"
                     },
                     {

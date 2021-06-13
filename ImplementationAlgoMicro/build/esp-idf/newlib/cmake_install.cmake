@@ -1,4 +1,4 @@
-# Install script for directory: /home/gaspard/esp/esp-idf/components/newlib
+# Install script for directory: /home/luc/esp/esp-idf/components/newlib
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -34,7 +34,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/gaspard/esp/TradCLyrat/build/esp-idf/newlib/port/cmake_install.cmake")
+  include("/home/luc/esp/ProjetPIR/ImplementationAlgoMicro/build/esp-idf/newlib/port/cmake_install.cmake")
 
 endif()
 

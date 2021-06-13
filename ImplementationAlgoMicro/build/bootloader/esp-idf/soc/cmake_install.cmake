@@ -1,4 +1,4 @@
-# Install script for directory: /home/gaspard/esp/esp-idf/components/soc
+# Install script for directory: /home/luc/esp/esp-idf/components/soc
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -34,7 +34,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/gaspard/esp/TradCLyrat/build/bootloader/esp-idf/soc/esp32/cmake_install.cmake")
+  include("/home/luc/esp/ProjetPIR/ImplementationAlgoMicro/build/bootloader/esp-idf/soc/esp32/cmake_install.cmake")
 
 endif()
 
