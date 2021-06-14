@@ -278,17 +278,15 @@ void audioTask(void * Adt)
   int number_mean = 5;
   float temp_pitch = 0.0;
   float mean_pitch = 0.0;
-  int nbSamples = 2500;
+  int nbSamples = 500;
+  float pitchLastTurn = 0.0;
 
   /*      Buffers initialization      */
   
- // float bufferRes[1000]; //Mettre une autre taille, c'est pas la bonne
   int16_t samples_data_in[nbSamples]; //samples to be read by the microphones
   float bufferEntree[nbSamples]; // samples casted in float
   float bufferOut[number_mean];
-  //float bufferFiltre[nbSamples];
   int lenReturn;
-  //float temp[2660];
 
   /*    Pitch Tracking using the samples coming from the microphones   */
 
@@ -299,16 +297,9 @@ void audioTask(void * Adt)
 
     for(int i = 0; i < nbSamples; i++){
       bufferEntree[i] = (float) (samples_data_in[i]); // casting samples to float
-      //printf("%f\n",bufferEntree[i]);
     }
 
     float *bufferFiltre = convolve2(coef, bufferEntree, nbCoef, nbSamples, &lenReturn);
-  
-    
-    for(int j=0; j<nbSamples ; j++){
-      fprintf(dat, "%d \n", (int) (bufferFiltre[j]));
-      //fprintf(dat, "%d\n", (int) (bufferEntree[j]));
-    }
 
     int buffer_length = nbSamples; //arbitrary length
 
@@ -320,20 +311,28 @@ void audioTask(void * Adt)
       free(yin.yinBuffer); // very important to avoid memory problems
     }*/
 
-    Yin_init(&yin, buffer_length, 0.2); // init of yin object with buffer length and threshold parameters
+    Yin_init(&yin, buffer_length, 0.5); // init of yin object with buffer length and threshold parameters
     temp_pitch = Yin_getPitch(&yin,bufferFiltre);
     //temp_pitch = Yin_getPitch(&yin,bufferEntree);
     //buffer_length += nbSamples;
     free(yin.yinBuffer); // very important to avoid memory problems
 
     bufferOut[count%number_mean] = temp_pitch;
-    printf("Fondamentale : %f\n", temp_pitch );
-    temp_pitch = 0.0;
-    printf("Tour numéro %d\n", count );
+    
+    //printf("Fondamentale : %f\n", temp_pitch );
+    //temp_pitch = 0.0;
+    //printf("Tour numéro %d\n", count );
+
     
     //i2s_write((i2s_port_t)0, &samples_data_in, nbSamples*sizeof(int16_t), &bytes_read, portMAX_DELAY);
 
-    
+    if(temp_pitch == -1){
+      fprintf(dat, "%d \n", (int) (pitchLastTurn));
+    }else{
+      fprintf(dat, "%d \n", (int) (temp_pitch));
+      pitchLastTurn = temp_pitch;
+    }
+
     if (count%number_mean == (number_mean-1)){
       mean_pitch = meanFrequency(bufferOut, number_mean);
       //fprintf(dat, "%d \n", (int) (mean_pitch));
@@ -347,7 +346,7 @@ void audioTask(void * Adt)
   }
 
   fclose(dat);
-  printf("a\n");
+  printf("Fin !\n");
 
   // Task has to deleted itself before returning
   vTaskDelete(NULL);

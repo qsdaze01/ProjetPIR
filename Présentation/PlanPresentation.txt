@@ -108,6 +108,7 @@ Plan :
 		- Gestion mémoire 
 		- Gestion du temps
 		- Filtrage 
+		- Présentation des résultats
 
 	Autres groupes
 
