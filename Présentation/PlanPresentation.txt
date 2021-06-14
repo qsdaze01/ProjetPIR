@@ -23,7 +23,6 @@ Audio Codec Chip (ES8388) :
 - on n'utilise le DAC que comme test pour vérifier ce qu'on entend
 - l'ADC nous sert à capter les données des micros ou de l'entrée jack
 - la fréquence d'échantillonnage est paramétrée à 48 000 Hz
-- 
 
 I2S : 
 - standard de serial bus pour connecter du matériel audio numérique
