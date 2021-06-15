@@ -43,4 +43,4 @@ https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/#step-4-
 
 ## Autres infos utiles ##       
  
--le port à mettre est /dev/ttyUSB0      
+- Le port à mettre est /dev/ttyUSB0      
