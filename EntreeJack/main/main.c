@@ -23,6 +23,4 @@ void app_main(){
 
   	// waiting forever
     vTaskSuspend(NULL);
-
-	//return;
 }

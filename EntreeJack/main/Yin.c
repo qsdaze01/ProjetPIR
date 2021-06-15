@@ -153,7 +153,7 @@ float Yin_parabolicInterpolation(Yin *yin, int16_t tauEstimate) {
 
 
 
-
+	
 
 /* ------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------- PUBLIC FUNCTIONS
@@ -167,6 +167,7 @@ float Yin_parabolicInterpolation(Yin *yin, int16_t tauEstimate) {
  * @param bufferSize Length of the audio buffer to analyse
  * @param threshold  Allowed uncertainty (e.g 0.05 will return a pitch with ~95% probability)
  */
+
 void Yin_init(Yin *yin, int16_t bufferSize, float threshold){
 	/* Initialise the fields of the Yin structure passed in */
 	yin->bufferSize = bufferSize;
@@ -180,7 +181,7 @@ void Yin_init(Yin *yin, int16_t bufferSize, float threshold){
 
     if (yin->yinBuffer == 0){
     	printf("buffer: plus de place mémoire");
-    	//exit(EXIT_FAILURE);
+    	exit(EXIT_FAILURE);
     }
 
 	int16_t i;

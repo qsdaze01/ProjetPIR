@@ -19,9 +19,9 @@ uint8_t initES(void)
   
   // ADC CONFIG
   writeReg(ES8388_ADCCONTROL1,136); // 1000 1000: mic preamps gains
-  writeReg(ES8388_ADCCONTROL2,84); // 0101 0100: Changement vers entrée input2 (jack)
-  writeReg(ES8388_ADCCONTROL3,130); // 1000 0010: Changement vers entrée input2 (jack)
-  //writeReg(ES8388_ADCCONTROL3,146); // 1001 0010: Changement vers entrée input2 (jack) MONO
+  writeReg(ES8388_ADCCONTROL2,84); // 0101 0100: Input2 (jack)
+  writeReg(ES8388_ADCCONTROL3,130); // 1000 0010: Input2 (jack) STEREO
+  //writeReg(ES8388_ADCCONTROL3,146); // 1001 0010: Input2 (jack) MONO
   writeReg(ES8388_ADCCONTROL4,12); // 0000 1100: settings i2s config (16 bits)
   writeReg(ES8388_ADCCONTROL5,2); // 0000 0010: ADC MCLK at 256 fo ADC
   writeReg(ES8388_ADCCONTROL8,0); // 0000 0000: Digital volume control attenuates the signal in 0.5 dB incremental at 0dB for ADC L

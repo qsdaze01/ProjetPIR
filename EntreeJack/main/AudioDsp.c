@@ -200,6 +200,8 @@ bool start(AudioDspType Adt){
 
   if (!Adt.fRunning) {
     Adt.fRunning = true;  
+    
+
     xTaskCreatePinnedToCore(&audioTask, "Audio DSP Task", 100000, &Adt, 2, &(Adt.fHandle), 0);
     vTaskSuspend(NULL);
     // All done, unmount partition and disable SDMMC or SPI peripheral
