@@ -16,10 +16,11 @@ dif_squared = 0;
 error_counter = 1;
 
 for i in range(1000):
-	if (val_read[i]!=-1):
-		dif_squared += (val_read[i]-val_temoin)*(val_read[i]-val_temoin);
-	else:
+	if ((val_read[i]==-1) or (val_read[i] < val_temoin-0.1*val_temoin) or (val_read[i] > val_temoin+0.1*val_temoin)):
 		error_counter += 1;
+	else:
+		dif_squared += (val_read[i]-val_temoin)*(val_read[i]-val_temoin);
+		
 	
 print("Nombre de -1 : ", error_counter - 1);
-print("Ecart a la valeur : " ,dif_squared/error_counter)
+print("Ecart a la valeur : " ,dif_squared/(1000 - error_counter))
