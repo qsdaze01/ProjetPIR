@@ -19,7 +19,9 @@ uint8_t initES(void)
   
   // ADC CONFIG
   writeReg(ES8388_ADCCONTROL1,136); // 1000 1000: mic preamps gains
+  //writeReg(ES8388_ADCCONTROL2,4); // 0000 0100: Input1 (microphones)
   writeReg(ES8388_ADCCONTROL2,84); // 0101 0100: Input2 (jack)
+  //writeReg(ES8388_ADCCONTROL3,2); // 0000 0010: Input1 (microphones) STEREO
   writeReg(ES8388_ADCCONTROL3,130); // 1000 0010: Input2 (jack) STEREO
   //writeReg(ES8388_ADCCONTROL3,146); // 1001 0010: Input2 (jack) MONO
   writeReg(ES8388_ADCCONTROL4,12); // 0000 1100: settings i2s config (16 bits)

@@ -1,4 +1,4 @@
-# Install script for directory: /home/gaspard/esp/EntreeJack/main
+# Install script for directory: /home/gaspard/esp/ProjetPitchTracking/main
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

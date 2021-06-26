@@ -178,9 +178,8 @@ void Yin_init(Yin *yin, int16_t bufferSize, float threshold){
 	/* Allocate the autocorellation buffer and initialise it to zero */
 	yin->yinBuffer = (float *) malloc(sizeof(float)* yin->halfBufferSize);
 
-
     if (yin->yinBuffer == 0){
-    	printf("buffer: plus de place mémoire");
+    	printf("Buffer: No memory available");
     	exit(EXIT_FAILURE);
     }
 
