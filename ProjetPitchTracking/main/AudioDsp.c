@@ -226,7 +226,9 @@ void stop(AudioDspType Adt)
   }
 }
 
+//Averaging, not used
 
+/*
 float meanFrequency(float* values, int number_mean){
   int meaner = 0;
   float sum = 0;
@@ -243,6 +245,7 @@ float meanFrequency(float* values, int number_mean){
     return(sum/meaner);
   }
 }
+*/
 
 // Convolution for the filter
 float* convolve2(float h[], float x[], int lenH, int lenX, int* lenY)
@@ -288,7 +291,7 @@ void audioTask(void * Adt)
   float bufferOut[number_mean];
   int lenReturn;
 
-  /*    Pitch Tracking using the samples coming from the microphones   */
+  /*    Pitch Tracking using the samples coming from the microphones or the jack input  */
 
   FILE *dat=fopen(MOUNT_POINT"/sound.dat", "w");
   while (count<1000) { // arbitrary condition, could very well be a "while (true)"
@@ -299,6 +302,7 @@ void audioTask(void * Adt)
       bufferEntree[i] = (float) (samples_data_in[i]); // casting samples to float
     }
 
+    //Filtering of the samples
     float *bufferFiltre = convolve2(coef, bufferEntree, nbCoef, nbSamples, &lenReturn);
 
     int buffer_length = nbSamples; //arbitrary length
@@ -307,11 +311,13 @@ void audioTask(void * Adt)
     temp_pitch = Yin_getPitch(&yin,bufferFiltre);
     free(yin.yinBuffer); // very important to avoid memory problems
 
-    bufferOut[count%number_mean] = temp_pitch;
+    //Averaging, not used
+    //bufferOut[count%number_mean] = temp_pitch;
     
-    //i2s_write((i2s_port_t)0, &samples_data_in, nbSamples*sizeof(int16_t), &bytes_read, portMAX_DELAY); // Useful to test the microphones with headphones
+    // Useful to test the microphones or the jack input with headphones
+    //i2s_write((i2s_port_t)0, &samples_data_in, nbSamples*sizeof(int16_t), &bytes_read, portMAX_DELAY); 
 
-    // To avoid errors
+    // To avoid convergence errors
     if(temp_pitch == -1){
       fprintf(dat, "%d \n", (int) (pitchLastTurn));
     }else{
@@ -319,11 +325,14 @@ void audioTask(void * Adt)
       pitchLastTurn = temp_pitch;
     }
 
-    // Not used
+    //Averaging, not used
+    
+    /*
     if (count%number_mean == (number_mean-1)){
       mean_pitch = meanFrequency(bufferOut, number_mean);
       mean_pitch=0;
     }
+    */
 
     free(bufferFiltre);
 

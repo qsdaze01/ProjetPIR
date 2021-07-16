@@ -1,3 +1,11 @@
+/*********************************************************************************
+
+Project "Pitch Tracking" developed by Luc DAVID, Gaspard MICHEL and Pakinam MORSY
+
+PIR 2020-2021 INSA Lyon
+
+*********************************************************************************/
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include <stdio.h>
@@ -15,7 +23,7 @@ void app_main(){
 	AudioDspType Adt;
 
 	Adt.fSampleRate = 48000;
-	Adt.fBufferSize = 266;
+	Adt.fBufferSize = 500;
 	Adt.fNumInputs = 1;
 	Adt.fNumOutputs = 1;
 	Adt.fHandle = NULL;

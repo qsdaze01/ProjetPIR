@@ -1,4 +1,4 @@
-/* * Data converted from /home/gaspard/esp/EntreeJack/build/esp-idf/mbedtls/x509_crt_bundle
+/* * Data converted from /home/gaspard/esp/ProjetPitchTracking/build/esp-idf/mbedtls/x509_crt_bundle
  */
 .data
 .section .rodata.embedded
